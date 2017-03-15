@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc noversion nomachine -mcpu=cortex-m4 -mthumb -Wall -ffunction-sections -g -O0 -c -DSTM32F407VG -DSTM32F4XX -DUSE_STDPERIPH_DRIVER -D__ASSEMBLY__ -I..\..\..\..\..\Users\Piotr\Desktop\STMBluetoothLedRing\cmsis_lib -I..\..\..\..\..\Users\Piotr\Desktop\STMBluetoothLedRing\cmsis_boot -I..\..\..\..\..\Users\Piotr\Desktop\STMBluetoothLedRing\cmsis -I..\..\..\..\..\Users\Piotr\Desktop\STMBluetoothLedRing -I..\..\..\..\..\Users\Piotr\Desktop\STMBluetoothLedRing\cmsis_lib\include -I..\..\..\..\..\Users\Piotr\Desktop">
+      <target file="stm32f4xx_gpio.o" lastModified="15ad155b938">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_gpio.c" lastModified="15ad14859eb"/>
+      </target>
+      <target file="stm32f4xx_tim.o" lastModified="15ad155baaf">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_tim.c" lastModified="15ad14925ee"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="15ad155b977">
+         <source file="..\..\..\cmsis_boot\system_stm32f4xx.c" lastModified="15ad1485a68"/>
+      </target>
+      <target file="startup_stm32f4xx.o" lastModified="15ad155b82f">
+         <source file="..\..\..\cmsis_boot\startup\startup_stm32f4xx.c" lastModified="15ad14859fa"/>
+      </target>
+      <target file="stm32f4xx_usart.o" lastModified="15ad155b7f0">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_usart.c" lastModified="15ad1493bad"/>
+      </target>
+      <target file="stm32f4xx_syscfg.o" lastModified="15ad155b783">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_syscfg.c" lastModified="15ad148b844"/>
+      </target>
+      <target file="stm32f4xx_exti.o" lastModified="15ad155b9c5">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_exti.c" lastModified="15ad1486c20"/>
+      </target>
+      <target file="main.o" lastModified="15ad155b87d">
+         <source file="..\..\..\main.c" lastModified="15ad14be8dc"/>
+      </target>
+      <target file="stm32f4xx_rcc.o" lastModified="15ad155b8da">
+         <source file="..\..\..\cmsis_lib\source\stm32f4xx_rcc.c" lastModified="15ad1485aa6"/>
+      </target>
+      <target file="misc.o" lastModified="15ad155ba13">
+         <source file="..\..\..\cmsis_lib\source\misc.c" lastModified="15ad148e659"/>
+      </target>
+   </processor>
+</history>
