@@ -13,28 +13,46 @@
 <part id="0"/>
 <part id="1"/>
 <part id="2"/>
+<part id="3"/>
+<part id="4"/>
+<part id="5"/>
+<part id="6"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor id="org.coocox.welcome.ui.WelcomePage" name="" partName="welcome" title="welcome" tooltip="" workbook="DefaultEditorWorkbook">
-<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">
-<org.coocox.welcome.ui.WelcomePage/>
+<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">&#x0A;<org.coocox.welcome.ui.WelcomePage/>
 </input>
 </editor>
 <editor id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" partName="Repository" title="Repository" tooltip="Repository" workbook="DefaultEditorWorkbook">
-<input factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory">
-<subPage horizontalPosition="0" selectedItemId="517" subPageIndex="2" verticalPosition="0"/>
+<input factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory">&#x0A;<subPage horizontalPosition="0" selectedItemId="518" subPageIndex="2" verticalPosition="282"/>
 </input>
 </editor>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/Piotr/Desktop/STMBluetoothLedRing/main.c" title="main.c" tooltip="C:/Users/Piotr/Desktop/STMBluetoothLedRing/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/STMBluetoothLedRing/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2618" selectionTopPixel="913"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="689" selectionTopPixel="99"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b_conf.h" partName="ws2812b_conf.h" path="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/include/ws2812b_conf.h" title="ws2812b_conf.h" tooltip="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/include/ws2812b_conf.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b_conf.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="164" selectionTopPixel="359"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b.c" partName="ws2812b.c" path="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/source/ws2812b.c" title="ws2812b.c" tooltip="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/source/ws2812b.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/STMBluetoothLedRing/cmsis_lib/source/ws2812b.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1818" selectionTopPixel="144"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b.h" partName="ws2812b.h" path="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/include/ws2812b.h" title="ws2812b.h" tooltip="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/include/ws2812b.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="214" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_dma.c" partName="stm32f4xx_dma.c" path="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/source/stm32f4xx_dma.c" title="stm32f4xx_dma.c" tooltip="C:/Users/Piotr/Desktop/STMBluetoothLedRing/cmsis_lib/source/stm32f4xx_dma.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/STMBluetoothLedRing/cmsis_lib/source/stm32f4xx_dma.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="4582"/>
 </editor>
 </editors>
 <views>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
-<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="7">
+<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="24">
 <expanded>
 <element path="/STMBluetoothLedRing"/>
 <element path="/STMBluetoothLedRing/cmsis"/>
@@ -42,6 +60,7 @@
 <element path="/STMBluetoothLedRing/cmsis_boot/startup"/>
 <element path="/STMBluetoothLedRing/cmsis_lib"/>
 <element path="/STMBluetoothLedRing/cmsis_lib/include"/>
+<element path="/STMBluetoothLedRing/cmsis_lib/source"/>
 </expanded>
 <selection>
 <element path="/STMBluetoothLedRing/main.c"/>
@@ -51,9 +70,16 @@
 <view id="org.coocox.component.ui.ComponentView" partName="Components">
 <viewState/>
 </view>
+<view id="org.coocox.codebugger.trace.ui.traceview" partName="Semihosting">
+<viewState/>
+</view>
+<view id="org.eclipse.debug.ui.DebugView" partName="Debug">
+<viewState/>
+</view>
 <view id="org.eclipse.ui.console.ConsoleView" partName="Console">
 <viewState/>
 </view>
+<view id="org.eclipse.debug.ui.VariableView" partName="Variables"/>
 <view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
 <viewState/>
 </view>
@@ -113,7 +139,7 @@
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@d8314c" ratio="0.6996753" ratioLeft="431" ratioRight="185" relationship="4" relative="org.eclipse.ui.internal.ViewStack@20a52f">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@d8314c" ratio="0.6881134" ratioLeft="631" ratioRight="286" relationship="4" relative="org.eclipse.ui.internal.ViewStack@20a52f">
 <folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
@@ -121,9 +147,9 @@
 </presentation>
 </folder>
 </info>
-<info part="org.coocox.builder.ui.exampleView" ratio="0.17391305" ratioLeft="332" ratioRight="1577" relationship="2" relative="org.eclipse.ui.internal.ViewStack@20a52f"/>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1fd245f" ratio="0.71887034" ratioLeft="560" ratioRight="219" relationship="2" relative="org.coocox.builder.ui.exampleView">
-<folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
+<info part="org.coocox.builder.ui.exampleView" ratio="0.21634364" ratioLeft="413" ratioRight="1496" relationship="2" relative="org.eclipse.ui.internal.ViewStack@20a52f"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1fd245f" ratio="0.80037665" ratioLeft="425" ratioRight="106" relationship="2" relative="org.coocox.builder.ui.exampleView">
+<folder activePageID="org.coocox.component.ui.Help" appearance="2" expanded="2">
 <page content="org.coocox.component.ui.Help" label="Help"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
@@ -147,22 +173,261 @@
 </mainWindow>
 </layout>
 </perspective>
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="org.coocox.codebugger.configuration.ui.Perspective" id="org.coocox.codebugger.configuration.perspective" label="CoDebugger"/>
+<alwaysOnActionSet id="org.coocox.component.ui.actionSet"/>
+<alwaysOnActionSet id="org.coocox.welcome.ui.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
+<hide_menu_item_id id="org.coocox.builder.ui.newFile"/>
+<hide_menu_item_id id="org.coocox.builder.ui.newFolder"/>
+<hide_menu_item_id id="org.coocox.builder.ui.openFile"/>
+<hide_menu_item_id id="org.eclipse.ui.file.save"/>
+<hide_menu_item_id id="org.eclipse.ui.file.saveAs"/>
+<hide_menu_item_id id="org.eclipse.ui.file.saveAll"/>
+<hide_menu_item_id id="org.coocox.builder.rcp.projectMenu"/>
+<hide_menu_item_id id="org.coocox.builder.rcp.flashMenu"/>
+<hide_menu_item_id id="org.coocox.builder.ui.showHelpViewAction"/>
+<hide_menu_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
+<hide_menu_item_id id="org.coocox.builder.ui.debug"/>
+<hide_menu_item_id id="org.coocox.builder.ui.build"/>
+<hide_menu_item_id id="org.coocox.builder.ui.rebuild"/>
+<hide_menu_item_id id="org.eclipse.jdt.ui.refactoring.menu"/>
+<hide_menu_item_id id="org.eclipse.jdt.ui.source.menu"/>
+<hide_menu_item_id id="org.coocox.builder.ui.actions.ConfigurationAction"/>
+<hide_menu_item_id id="org.coocox.welcome.ui.action.welcome"/>
+<hide_menu_item_id id="org.coocox.welcome.ui.action.repository"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.newProject"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.newFile"/>
+<hide_toolbar_item_id id="org.eclipse.ui.file.save"/>
+<hide_toolbar_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.build"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.rebuild"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.debug"/>
+<hide_toolbar_item_id id="org.coocox.codebugger.configuration.coideProgramDownloadAction"/>
+<hide_toolbar_item_id id="org.coocox.codebugger.configuration.coideFlashEraseAction"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.actions.TargetManageAction"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.actions.ConfigurationAction"/>
+<hide_toolbar_item_id id="org.coocox.welcome.ui.action.welcome"/>
+<hide_toolbar_item_id id="org.coocox.welcome.ui.action.repository"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.eclipse.debug.ui.DebugView"/>
+<view id="org.coocox.codebugger.trace.ui.traceview"/>
+<view id="org.eclipse.debug.ui.VariableView"/>
+<view id="org.coocox.builder.ui.views.ProjectView"/>
+<fastViewBars/>
+<viewLayoutRec closeable="false" id="org.eclipse.debug.ui.DebugView"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@185c09">&#x0A;<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="1434" ratioRight="478" relationship="2" relative="org.eclipse.ui.internal.ViewStack@185c09">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@161801a" ratio="0.7" ratioLeft="644" ratioRight="276" relationship="4" relative="org.eclipse.ui.internal.ViewStack@185c09">&#x0A;<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
+<page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@e7eab6" ratio="0.5" ratioLeft="956" ratioRight="956" relationship="2" relative="org.eclipse.ui.internal.ViewStack@161801a">&#x0A;<folder activePageID="org.coocox.codebugger.trace.ui.traceview" appearance="2" expanded="2">&#x0A;<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
+<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
+<page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
+<page content="org.eclipse.debug.ui.MemoryView" label="LabelNotFound"/>
+<page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@21061d" ratio="0.75" ratioLeft="1434" ratioRight="478" relationship="2" relative="org.eclipse.ui.internal.ViewStack@185c09">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="LabelNotFound"/>
+<page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
+<page content="org.eclipse.debug.ui.RegisterView" label="LabelNotFound"/>
+<page content="org.coocox.coassistant.view.CoAssistantView_debug" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.29986054" ratioLeft="430" ratioRight="1004" relationship="2" relative="org.eclipse.ui.internal.ViewStack@185c09"/>
+</mainWindow>
+</layout>
+</perspective>
 </perspectives>
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage">
-<org.coocox.welcome.ui.WelcomePage/>
-</editor>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/source/ws2812b.c"/>
+<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" uri="file:/C:/Users/Piotr/Desktop/ws2812b.c"/>
+<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" uri="file:/C:/Users/Piotr/Desktop/ws2812b.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/source/ws2812b.c"/>
 <editor factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser">
-<subPage horizontalPosition="0" selectedItemId="517" subPageIndex="2" verticalPosition="0"/>
+<subPage horizontalPosition="0" selectedItemId="518" subPageIndex="2" verticalPosition="282"/>
 </editor>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/source/ws2812b.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b_conf.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/cmsis_lib/source/stm32f4xx_dma.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/STMBluetoothLedRing/main.c"/>
 </editors>
-<item historyLabel="welcome" index="0"/>
-<item historyLabel="Repository" index="1"/>
-<item active="true" historyLabel="main.c" index="2">
-<position info="not_deleted" x="2620" y="0"/>
+<item historyLabel="ws2812b.c" index="1">
+<position info="not_deleted" x="6023" y="179"/>
+</item>
+<item historyLabel="ws2812b.c" index="2">
+<position/>
+</item>
+<item historyLabel="ws2812b.c" index="3">
+<position info="not_deleted" x="106" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="0" y="112"/>
+</item>
+<item historyLabel="ws2812b.c" index="2">
+<position info="not_deleted" x="96" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="3">
+<position info="not_deleted" x="106" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="2">
+<position info="not_deleted" x="250" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="3">
+<position info="not_deleted" x="106" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="2">
+<position info="not_deleted" x="229" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="4">
+<position info="not_deleted" x="1992" y="52"/>
+</item>
+<item historyLabel="ws2812b.c" index="2">
+<position info="not_deleted" x="229" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1488" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="4">
+<position info="not_deleted" x="1150" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1488" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="595" y="18"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1454" y="38"/>
+</item>
+<item historyLabel="ws2812b.c" index="5">
+<position info="not_deleted" x="384" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1454" y="38"/>
+</item>
+<item historyLabel="ws2812b.c" index="5">
+<position info="not_deleted" x="384" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="5">
+<position info="not_deleted" x="250" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="5">
+<position info="not_deleted" x="1994" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1454" y="38"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="171" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="191" y="0"/>
+</item>
+<item historyLabel="Repository" index="6"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="299" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="7">
+<position info="not_deleted" x="2042" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="ws2812b.c" index="7">
+<position info="not_deleted" x="2036" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="ws2812b.c" index="7">
+<position info="not_deleted" x="1818" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="ws2812b_conf.h" index="8">
+<position info="not_deleted" x="164" y="0"/>
+</item>
+<item historyLabel="ws2812b.h" index="9">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="7">
+<position info="not_deleted" x="1818" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="749" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="803" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="751" y="11"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="764" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="7">
+<position info="not_deleted" x="1818" y="0"/>
+</item>
+<item historyLabel="ws2812b_conf.h" index="8">
+<position info="not_deleted" x="164" y="0"/>
+</item>
+<item historyLabel="ws2812b.h" index="9">
+<position info="not_deleted" x="214" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="764" y="0"/>
+</item>
+<item historyLabel="ws2812b.h" index="9">
+<position info="not_deleted" x="214" y="0"/>
+</item>
+<item historyLabel="ws2812b.c" index="7">
+<position info="not_deleted" x="1818" y="0"/>
+</item>
+<item historyLabel="ws2812b_conf.h" index="8">
+<position info="not_deleted" x="164" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="764" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="0" y="812"/>
+</item>
+<item historyLabel="stm32f4xx_dma.c" index="10">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item active="true" historyLabel="main.c" index="11">
+<position info="not_deleted" x="0" y="767"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -171,12 +436,29 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_dma.c" tooltip="STMBluetoothLedRing/cmsis_lib/source/stm32f4xx_dma.c">
+<persistable path="/STMBluetoothLedRing/cmsis_lib/source/stm32f4xx_dma.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b.h" tooltip="STMBluetoothLedRing/cmsis_lib/include/ws2812b.h">
+<persistable path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.systemExternalEditor" name="stm32f4xx_dsp_stdperiph_lib_um.chm" tooltip="STMBluetoothLedRing/cmsis_lib/include/stm32f4xx_dsp_stdperiph_lib_um.chm">
+<persistable path="/STMBluetoothLedRing/cmsis_lib/include/stm32f4xx_dsp_stdperiph_lib_um.chm"/>
+</file>
+<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b.c" tooltip="C:\Users\Piotr\Desktop\ws2812b.c">
+<persistable uri="file:/C:/Users/Piotr/Desktop/ws2812b.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b.c" tooltip="STMBluetoothLedRing/cmsis_lib/include/ws2812b.c">
+<persistable path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ws2812b_conf.h" tooltip="STMBluetoothLedRing/cmsis_lib/include/ws2812b_conf.h">
+<persistable path="/STMBluetoothLedRing/cmsis_lib/include/ws2812b_conf.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="STMBluetoothLedRing/main.c">
 <persistable path="/STMBluetoothLedRing/main.c"/>
 </file>
 <file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
-<persistable>
-<subPage horizontalPosition="0" selectedItemId="517" subPageIndex="2" verticalPosition="0"/>
+<persistable>&#x0A;<subPage/>
 </persistable>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="bluetooth/main.c">
@@ -184,6 +466,22 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx.h" tooltip="bluetooth/cmsis_boot/stm32f4xx.h">
 <persistable path="/bluetooth/cmsis_boot/stm32f4xx.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="STMBluetoothLedRing/main.c">
+<persistable path="/STMBluetoothLedRing/main.c"/>
+</file>
+<file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
+<persistable>&#x0A;<subPage horizontalPosition="0" selectedItemId="517" subPageIndex="2" verticalPosition="0"/>
+</persistable>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="bluetooth/main.c">
+<persistable path="/bluetooth/main.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx.h" tooltip="bluetooth/cmsis_boot/stm32f4xx.h">
+<persistable path="/bluetooth/cmsis_boot/stm32f4xx.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.systemExternalEditor" name="stm32f4xx_dsp_stdperiph_lib_um.chm" tooltip="STMBluetoothLedRing/cmsis_lib/include/stm32f4xx_dsp_stdperiph_lib_um.chm">
+<persistable path="/STMBluetoothLedRing/cmsis_lib/include/stm32f4xx_dsp_stdperiph_lib_um.chm"/>
 </file>
 </mruList>
 </workbench>
