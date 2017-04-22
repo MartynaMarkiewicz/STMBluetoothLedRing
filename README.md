@@ -1,32 +1,24 @@
-# STMBluetoothLedRing
+﻿# STMBluetoothLedRing
 
-##Overview:
+Overview:
 
-##Tools: 
+Tools: 
 
-##How to run:
+How to run:
 
-##How to compile:
+How to compile:
 
-##Future improvements:
+Future improvements:
 
-##Attributions:
+Attributions:
 
-##License:
+License:
 
-<<<<<<< HEAD
-##Credits:
-Piotr Gozdziewski
-=======
 Credits:
 Piotr Goździewski,
->>>>>>> origin/master
 Martyna Markiewicz
 
 The project was conducted during the Microprocessor Lab course held by the Institute of Control and Information Engineering, Poznan University of Technology.
 
-<<<<<<< HEAD
-##Supervisor: Tomasz Mankowski
-=======
 Supervisor: Tomasz Mańkowski
->>>>>>> origin/master
+
