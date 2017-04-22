@@ -15,9 +15,9 @@ Attributions:
 License:
 
 Credits:
-Piotr Goüdziewski
+Piotr Go≈∫dziewski
 Martyna Markiewicz
 
 The project was conducted during the Microprocessor Lab course held by the Institute of Control and Information Engineering, Poznan University of Technology.
 
-Supervisor: Tomasz MaÒkowski
+Supervisor: Tomasz Ma≈Ñkowski
