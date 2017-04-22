@@ -28,6 +28,7 @@ int main(void)
 
 	while(1)
 	{
-		WS2812B_SetRGB(0, 0, 255,0,0);
+		WS2812B_SetRGB(0, 0, 0,0,255);
+		//WS2812B_SetRGB(0, 1, 0,255,0);
 	}
 }
