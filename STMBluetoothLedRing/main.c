@@ -29,6 +29,56 @@ int j=0;
 int x=0;
 bool skanuje,s,k,m;
 
+void TIM3_IRQHandler(void)
+{
+         	if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
+         	{
+         		//diode[0].blue=0;
+         		diode[1].red=255;
+         		GPIO_SetBits(GPIOD,GPIO_Pin_15);
+                TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+         	}
+}
+
+void TimerConfig()
+{
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+
+	//sygnal 1Hz
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	TIM_TimeBaseStructure.TIM_Period = 8399;
+	TIM_TimeBaseStructure.TIM_Prescaler = 9999;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+	TIM_Cmd(TIM3, ENABLE);
+
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_InitTypeDef NVIC_InitStructure;
+		// numer przerwania
+		NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+		// priorytet g³ówny
+		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
+		// subpriorytet
+		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+		// uruchom dany kana³
+		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+		// zapisz wype³nion¹ strukturê do rejestrów
+		NVIC_Init(&NVIC_InitStructure);
+		// wyczyszczenie przerwania od timera 3 (wyst¹pi³o przy konfiguracji timera)
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+		// zezwolenie na przerwania od przepe³nienia dla timera 3
+		TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+
+		NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
+		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+		NVIC_Init(&NVIC_InitStructure);
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+		TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+}
+
 void rcc()
 {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -55,7 +105,7 @@ void gpio()
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14|GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
@@ -130,9 +180,11 @@ int main(void)
 	usart();
 	init_systick();	//delay
 	ws2812_init();	//LED + PWM
-
+	TimerConfig();
 	while(1)
 	{
+		diode[0].blue=255;
+		GPIO_SetBits(GPIOD,GPIO_Pin_14);
 	}
 }
 
@@ -151,6 +203,8 @@ int blue_br;
 int red_br1;
 int blue_br1;
 int green_br1;
+
+
 void USART3_IRQHandler(void)
 {
 		if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
@@ -177,6 +231,7 @@ void USART3_IRQHandler(void)
 
 			if(USART3->DR == 'R')
 			{
+				brightness=100;
 				red_p = 0;
 				s = 1;
 			}
@@ -195,6 +250,7 @@ void USART3_IRQHandler(void)
 
 			if(USART3->DR == 'G')
 			{
+				brightness=100;
 				green_p = 0;
 				k = 1;
 			}
@@ -213,6 +269,7 @@ void USART3_IRQHandler(void)
 
 			if(USART3->DR == 'B')
 			{
+				brightness=100;
 				blue_p = 0;
 				m = 1;
 			}
@@ -220,7 +277,6 @@ void USART3_IRQHandler(void)
 			{
 				if(c<1)
 				blue_p=0;
-
 				if (c >= 1 && c <= 255&&c!=76&&c!=82&&c!=71)
 				{
 					blue_p = c*4-1;
@@ -229,6 +285,7 @@ void USART3_IRQHandler(void)
 				else
 				m=0;
 			}
+
 			rgb(red_p, green_p,blue_p);
 			if(brightness)
 			{
@@ -256,52 +313,52 @@ void USART3_IRQHandler(void)
 			//do kolorow
 			if(USART3->DR == 'g')
 			{
-				brightness=100;
 				red_br=135;
 				green_br=31;
 				blue_br=0;
+				brightness=100;
 			}
 			if(USART3->DR == 'h')
 			{
-				brightness=101;
 				red_br=195;
 				green_br=111;
 				blue_br=0;
+				brightness=100;
 			}
 			if(USART3->DR == 'i')
 			{
-				brightness=101;
-				red_br1=24;
-				green_br1=100;
-				blue_br1=0;
+				red_br=24;
+				green_br=100;
+				blue_br=0;
+				brightness=100;
 			}
 			if(USART3->DR == 'j')
 			{
-				brightness=101;
-				red_br1=0;
-				green_br1=243;
-				blue_br1=75;
+				red_br=0;
+				green_br=243;
+				blue_br=75;
+				brightness=100;
 			}
 			if(USART3->DR == 'k')
 			{
-				brightness=101;
-				red_br1=255;
-				green_br1=0;
-				blue_br1=51;
+				red_br=255;
+				green_br=0;
+				blue_br=51;
+				brightness=100;
 			}
 			if(USART3->DR == 'l')
 			{
-				brightness=101;
-				red_br1=255;
-				green_br1=0;
-				blue_br1=255;
+				red_br=255;
+				green_br=0;
+				blue_br=255;
+				brightness=100;
 			}
 			if(USART3->DR == 'm')
 			{
-				brightness=101;
-				red_br1=19;
-				green_br1=0;
-				blue_br1=207;
+				red_br=19;
+				green_br=0;
+				blue_br=207;
+				brightness=100;
 			}
 
 			//do sekwencji
