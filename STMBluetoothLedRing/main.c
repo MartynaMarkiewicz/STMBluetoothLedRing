@@ -9,7 +9,7 @@
 #include "stm32f4xx_adc.h"
 #include "stm32f4xx_syscfg.h"
 #include <misc.h>
-#include "delay.h"
+//#include "delay.h"
 #include "ws2812.h"
 #include "math.h"
 #include "stm32f4xx_usart.h"
@@ -29,54 +29,58 @@ int j=0;
 int x=0;
 bool skanuje,s,k,m;
 
+volatile int delayFlag;
 void TIM3_IRQHandler(void)
 {
          	if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
          	{
-         		//diode[0].blue=0;
-         		diode[1].red=255;
-         		GPIO_SetBits(GPIOD,GPIO_Pin_15);
-                TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-         	}
+         			GPIO_SetBits(GPIOD,GPIO_Pin_14|GPIO_Pin_15);
+         			delayFlag=1;
+         			diode[5].blue=255;
+       		}
+              	 //wyzerowanie flagi wyzwolonego przerwania
+               	TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 }
 
-void TimerConfig()
+void timer()
 {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
-	//sygnal 1Hz
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructure.TIM_Period = 8399;
 	TIM_TimeBaseStructure.TIM_Prescaler = 9999;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up ;
 	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
 	TIM_Cmd(TIM3, ENABLE);
+//	TIM_OCInitTypeDef TIM_OCInitStructure;
+//
+//	     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Timing;
+//	     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+//	     TIM_OCInitStructure.TIM_Pulse = 83;   // T= 1us!
+//	     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+//
+//	   TIM_OC1Init(TIM1, &TIM_OCInitStructure);
+//
+//	   TIM_OC1PreloadConfig(TIM3,TIM_OCPreload_Enable);
+//	   TIM_ITConfig(TIM3, TIM_IT_CC1, ENABLE);
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	NVIC_InitTypeDef NVIC_InitStructure;
-		// numer przerwania
-		NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-		// priorytet g³ówny
-		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
-		// subpriorytet
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
-		// uruchom dany kana³
-		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-		// zapisz wype³nion¹ strukturê do rejestrów
-		NVIC_Init(&NVIC_InitStructure);
-		// wyczyszczenie przerwania od timera 3 (wyst¹pi³o przy konfiguracji timera)
-		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-		// zezwolenie na przerwania od przepe³nienia dla timera 3
-		TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+	// numer przerwania
+	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+	// priorytet g³ówny
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
+	// subpriorytet
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+	// uruchom dany kana³
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	// zapisz wype³nion¹ strukturê do rejestrów
+	NVIC_Init(&NVIC_InitStructure);
 
-		NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00;
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
-		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-		NVIC_Init(&NVIC_InitStructure);
-		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-		TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+	TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	// zezwolenie na przerwania od przepe³nienia dla timera 3
+	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
 }
 
 void rcc()
@@ -86,7 +90,7 @@ void rcc()
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE );
+	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE );
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
 }
 
@@ -105,7 +109,7 @@ void gpio()
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14|GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_13|GPIO_Pin_12;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
@@ -178,13 +182,10 @@ int main(void)
 	rcc();
 	gpio();
 	usart();
-	init_systick();	//delay
+	//init_systick();	//delay
 	ws2812_init();	//LED + PWM
-	TimerConfig();
 	while(1)
 	{
-		diode[0].blue=255;
-		GPIO_SetBits(GPIOD,GPIO_Pin_14);
 	}
 }
 
@@ -317,6 +318,7 @@ void USART3_IRQHandler(void)
 				green_br=31;
 				blue_br=0;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 			if(USART3->DR == 'h')
 			{
@@ -324,6 +326,7 @@ void USART3_IRQHandler(void)
 				green_br=111;
 				blue_br=0;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 			if(USART3->DR == 'i')
 			{
@@ -331,6 +334,7 @@ void USART3_IRQHandler(void)
 				green_br=100;
 				blue_br=0;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 			if(USART3->DR == 'j')
 			{
@@ -338,6 +342,7 @@ void USART3_IRQHandler(void)
 				green_br=243;
 				blue_br=75;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 			if(USART3->DR == 'k')
 			{
@@ -345,6 +350,7 @@ void USART3_IRQHandler(void)
 				green_br=0;
 				blue_br=51;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 			if(USART3->DR == 'l')
 			{
@@ -352,6 +358,7 @@ void USART3_IRQHandler(void)
 				green_br=0;
 				blue_br=255;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 			if(USART3->DR == 'm')
 			{
@@ -359,6 +366,7 @@ void USART3_IRQHandler(void)
 				green_br=0;
 				blue_br=207;
 				brightness=100;
+				rgb(red_br, green_br,blue_br);
 			}
 
 			//do sekwencji
@@ -367,7 +375,9 @@ void USART3_IRQHandler(void)
 				red_p=0;
 				green_p=0;
 				blue_p=0;
-				s1();
+
+				diode[0].blue=255;
+				diode[2].green=255;
 			}
 			if(USART3->DR == 'b')
 			{
