@@ -2,14 +2,21 @@ package com.led.led;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
@@ -21,12 +28,13 @@ import java.lang.String;
 import java.util.UUID;
 
 
-public class ledControl extends ActionBarActivity {
+public class ledControl extends ActionBarActivity { //implements AdapterView.OnItemSelectedListener{
 
     Button btnOn, btnOff, btnDis, btnS1, btnS2, btnS3, btnS4, btnS5, btnS6;
-    SeekBar brightness, red, green, blue;
+    SeekBar brightness, red, green, blue,ringnumber;
     TextView lumn, lumnred,lumngreen,lumnblue,l,r,g,b;
     ImageButton c1,c2,c3,c4,c5,c6,c7;
+
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -67,20 +75,21 @@ public class ledControl extends ActionBarActivity {
         r = (TextView)findViewById(R.id.r);
         g = (TextView)findViewById(R.id.g);
         b = (TextView)findViewById(R.id.b);
-        c1= (ImageButton)findViewById(R.id.imageButton2);
-        c2= (ImageButton)findViewById(R.id.imageButton3);
-        c3= (ImageButton)findViewById(R.id.imageButton4);
-        c4= (ImageButton)findViewById(R.id.imageButton5);
-        c5= (ImageButton)findViewById(R.id.imageButton6);
-        c6= (ImageButton)findViewById(R.id.imageButton7);
-        c7= (ImageButton)findViewById(R.id.imageButton8);
+        c1 = (ImageButton)findViewById(R.id.imageButton2);
+        c2 = (ImageButton)findViewById(R.id.imageButton3);
+        c3 = (ImageButton)findViewById(R.id.imageButton4);
+        c4 = (ImageButton)findViewById(R.id.imageButton5);
+        c5 = (ImageButton)findViewById(R.id.imageButton6);
+        c6 = (ImageButton)findViewById(R.id.imageButton7);
+        c7 = (ImageButton)findViewById(R.id.imageButton8);
+        ringnumber = (SeekBar)findViewById(R.id.seekBar5);
 
 
         new ConnectBT().execute(); //Call the class to connect
 
         //commands to be sent to bluetooth
 
-        btnOff.setOnClickListener(new View.OnClickListener() {  //Turn off - Button
+        btnOff.setOnClickListener(new OnClickListener() {  //Turn off - Button
             @Override
             public void onClick(View v)
             {
@@ -88,7 +97,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        btnS1.setOnClickListener(new View.OnClickListener(){  //Sequence1 - button
+        btnS1.setOnClickListener(new OnClickListener(){  //Sequence1 - button
         public void onClick(View v)
         {
             if (Socket!=null)
@@ -105,7 +114,7 @@ public class ledControl extends ActionBarActivity {
         }
         });
 
-        btnS2.setOnClickListener(new View.OnClickListener(){  //Sequence2 - button
+        btnS2.setOnClickListener(new OnClickListener(){  //Sequence2 - button
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -122,7 +131,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        btnS3.setOnClickListener(new View.OnClickListener(){  //Sequence3 - button
+        btnS3.setOnClickListener(new OnClickListener(){  //Sequence3 - button
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -139,7 +148,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        btnS4.setOnClickListener(new View.OnClickListener(){  //Sequence4 - button
+        btnS4.setOnClickListener(new OnClickListener(){  //Sequence4 - button
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -156,7 +165,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        btnS5.setOnClickListener(new View.OnClickListener(){  //Sequence5 - button
+        btnS5.setOnClickListener(new OnClickListener(){  //Sequence5 - button
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -173,7 +182,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        btnS6.setOnClickListener(new View.OnClickListener(){  //Sequence6 - button
+        btnS6.setOnClickListener(new OnClickListener(){  //Sequence6 - button
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -190,7 +199,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        btnDis.setOnClickListener(new View.OnClickListener()  //Disconnected - button (return to the first layout PairDev)
+        btnDis.setOnClickListener(new OnClickListener()  //Disconnected - button (return to the first layout PairDev)
         {
             @Override
             public void onClick(View v)
@@ -198,6 +207,8 @@ public class ledControl extends ActionBarActivity {
                 Disconnect();
             }
         });
+
+
 
         brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { //brightness - button
             @Override
@@ -217,7 +228,7 @@ public class ledControl extends ActionBarActivity {
                     }
                     catch (IOException e)
                     {
-
+                        msg("Error");
                     }
                 }
             }
@@ -253,7 +264,7 @@ public class ledControl extends ActionBarActivity {
                     }
                     catch (IOException e)
                     {
-
+                        msg("Error");
                     }
                 }
             }
@@ -286,7 +297,7 @@ public class ledControl extends ActionBarActivity {
                     }
                     catch (IOException e)
                     {
-
+                        msg("Error");
                     }
                 }
             }
@@ -319,7 +330,7 @@ public class ledControl extends ActionBarActivity {
                     }
                     catch (IOException e)
                     {
-
+                        msg("Error");
                     }
                 }
             }
@@ -333,7 +344,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        c1.setOnClickListener(new View.OnClickListener(){  //color1
+        c1.setOnClickListener(new OnClickListener(){  //color1
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -349,7 +360,7 @@ public class ledControl extends ActionBarActivity {
                 }
             }
         });
-        c2.setOnClickListener(new View.OnClickListener(){  //color2
+        c2.setOnClickListener(new OnClickListener(){  //color2
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -366,7 +377,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        c3.setOnClickListener(new View.OnClickListener(){  //color3
+        c3.setOnClickListener(new OnClickListener(){  //color3
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -383,7 +394,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        c4.setOnClickListener(new View.OnClickListener(){  //color4
+        c4.setOnClickListener(new OnClickListener(){  //color4
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -400,7 +411,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        c5.setOnClickListener(new View.OnClickListener(){  //color5
+        c5.setOnClickListener(new OnClickListener(){  //color5
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -417,7 +428,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        c6.setOnClickListener(new View.OnClickListener(){  //color6
+        c6.setOnClickListener(new OnClickListener(){  //color6
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -434,7 +445,7 @@ public class ledControl extends ActionBarActivity {
             }
         });
 
-        c7.setOnClickListener(new View.OnClickListener(){  //color7
+        c7.setOnClickListener(new OnClickListener(){  //color7
             public void onClick(View v)
             {
                 if (Socket!=null)
@@ -449,10 +460,68 @@ public class ledControl extends ActionBarActivity {
                     }
                 }
             }
+
         });
 
+        ringnumber.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){  //SELECT RING NUMBER - default Ring1
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                if (fromUser==true)
+                {
+                    if(progress==0)
+
+                        try
+                        {
+                            Socket.getOutputStream().write('x');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
+                    if(progress==1)
+                    {
+                        try
+                        {
+                            Socket.getOutputStream().write('y');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
     }
+
+
+    //SPINNER
+   // @Override
+    //public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+   //     TextView myText= (TextView) view;
+   //     Toast.makeText(this,"You Selceted "+myText.getText(),Toast.LENGTH_SHORT).show();
+
+
+   // }
+
+   // @Override
+    //public void onNothingSelected(AdapterView<?> parent) {
+
+   // }
 
     private void Disconnect()
     {
@@ -511,6 +580,9 @@ public class ledControl extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
 
     private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
     {
