@@ -4,16 +4,16 @@
 #include <stm32f4xx.h>
 
 //enter number of LEDs here!
-#define FRAMEBUFFER_SIZE 8
+#define FRAMEBUFFER_SIZE 16
 
 //Size of Ring-Buffer
 #define PWM_BUFFER_SIZE 192
 
 
 struct led {
-	unsigned int red : 8;
-	unsigned int green : 8;
-	unsigned int blue : 8;
+	unsigned int red : 16;
+	unsigned int green : 16;
+	unsigned int blue : 16;
 	};
 	
 

@@ -4,6 +4,6 @@
 void clear_s(int s);
 void clear();
 void clear_all();
-void clear_app();
+void clear_app(int k,int j);
 
 #endif

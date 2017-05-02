@@ -1,17 +1,16 @@
 #ifndef SEKWENCJE_H
 #define SEKWENCJE_H
 
-void s1();
-void s2();
-void s3();
-void s4();
-void s5();
-void s6();
-void s7();
-void s9();
-void s10();
-void s11();
-void s12();
+void seq1(int k, int j);
+void seq2(int k, int j);
+void seq3(int k, int j);
+void seq4(int k, int j);
+void seq5(int k, int j);
+void seq6(int k, int j);
+void seq7(int k, int j);
+void seq8(int k, int j); // s7 dla ring 2
+void seq9(int k, int j);
+void seq10(int k, int j);
 
 #endif
 

@@ -12,7 +12,6 @@ void clear_s(int s)
 	}
 }
 
-//gasnie kazda po kolei
 void clear()
 {
 	int i=0;
@@ -37,10 +36,10 @@ void clear_all()
 	delay_ms(500);
 }
 
-void clear_app()
+void clear_app(int k, int j)
 {
 	int i=0;
-	for(i=0;i<8;i++)
+	for(i=k;i<j;i++)
 	{
 		diode[i].red=0;
 		diode[i].blue=0;
