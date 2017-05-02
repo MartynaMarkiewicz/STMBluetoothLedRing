@@ -333,6 +333,7 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
                         msg("Error");
                     }
                 }
+
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -541,16 +542,45 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
     private void turnOffLed()  //Procedure TurnOff
     {
         if (Socket!=null)
-        {
-            try
             {
-                Socket.getOutputStream().write('O');
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
+                try
+                {
+                    red.setProgress(0);
+                    green.setProgress(0);
+                    blue.setProgress(0);
+                    changevar();
+                    Socket.getOutputStream().write('O');
+
+                }
+                catch (IOException e)
+                {
+                    msg("Error");
+                }
         }
+    }
+    public void changevar()  //WYRESETOWANIE WSZYSTKICH WARTOSCI- USATWIENIE SEEKBARÓW NA wart. pocz.
+    {
+                    Integer pr=0;
+                    lumnred.setText(String.valueOf(progress));
+                    r.setText(String.valueOf(pr));
+                    lumngreen.setText(String.valueOf(progress));
+                    g.setText(String.valueOf(pr));
+                    lumnblue.setText(String.valueOf(progress));
+                    b.setText(String.valueOf(pr));
+
+                    try
+                    {
+                        Socket.getOutputStream().write('R');
+                        Socket.getOutputStream().write(Integer.valueOf(pr));
+                        Socket.getOutputStream().write('G');
+                        Socket.getOutputStream().write(Integer.valueOf(pr));
+                        Socket.getOutputStream().write('B');
+                        Socket.getOutputStream().write(Integer.valueOf(pr));
+                    }
+                    catch (IOException e)
+                    {
+                        msg("Error");
+                    }
     }
 
     // fast way to call Toast
