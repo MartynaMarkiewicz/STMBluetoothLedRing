@@ -1,22 +1,22 @@
 package com.led.led;
 
+import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.internal.widget.AdapterViewCompat;
+import android.util.Log;
+import android.util.Size;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.webkit.WebSettings;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.ProgressDialog;
@@ -26,21 +26,27 @@ import android.os.AsyncTask;
 import java.io.IOException;
 import java.lang.String;
 import java.util.UUID;
+import java.lang.Object;
+import java.io.InputStream;
 
 
-public class ledControl extends ActionBarActivity { //implements AdapterView.OnItemSelectedListener{
+public class ledControl extends ActionBarActivity {
 
-    Button btnOn, btnOff, btnDis, btnS1, btnS2, btnS3, btnS4, btnS5, btnS6;
+    Button btnOff, btnDis, btnS1, btnS2, btnS3, btnS4, btnS5, btnS6;
     SeekBar brightness, red, green, blue,ringnumber;
     TextView lumn, lumnred,lumngreen,lumnblue,l,r,g,b;
     ImageButton c1,c2,c3,c4,c5,c6,c7;
-
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket Socket = null;
     private boolean isBtConnected = false;
-    //SPP UUID. Look for it
+    Integer pr_redR1=0,pr_redR2=0, pr_greenR1=0,pr_greenR2=0,pr_blueR1=0,pr_blueR2=0,pr_brightnessR1=10,pr_brightnessR2=10;
+    Integer temp_ring=0;
+    Integer temp_S1R1=0,temp_S2R1=0,temp_S3R1=0,temp_S4R1=0,temp_S5R1=0,temp_S6R1=0;  //pomocnicze przy zmianie ringa ring1
+    Integer temp_S1R2=0,temp_S2R2=0,temp_S3R2=0,temp_S4R2=0,temp_S5R2=0,temp_S6R2=0;  //ring2
+
+
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
@@ -84,12 +90,12 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
         c7 = (ImageButton)findViewById(R.id.imageButton8);
         ringnumber = (SeekBar)findViewById(R.id.seekBar5);
 
-
         new ConnectBT().execute(); //Call the class to connect
 
         //commands to be sent to bluetooth
 
-        btnOff.setOnClickListener(new OnClickListener() {  //Turn off - Button
+        //Button - TURN OFF
+        btnOff.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v)
             {
@@ -97,14 +103,112 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        btnS1.setOnClickListener(new OnClickListener(){  //Sequence1 - button
+        //Button - Sequence1
+        btnS1.setOnClickListener(new OnClickListener(){
         public void onClick(View v)
         {
             if (Socket!=null)
             {
                 try
                 {
-                    Socket.getOutputStream().write('a');
+                    if(btnS1.getCurrentTextColor()==Color.RED)
+                    {
+                        Toast.makeText(getApplicationContext(),"SEQUENCE IS ON", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    if(btnS2.getCurrentTextColor()==Color.RED || btnS3.getCurrentTextColor()==Color.RED || btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
+                    {
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE OTHER SEQUENCE", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        if(temp_ring==0) //ring1
+                        {
+                            if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
+                            {
+                                Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                            {
+                                Socket.getOutputStream().write('R');
+                                Socket.getOutputStream().write(Integer.valueOf(0));
+                                Socket.getOutputStream().write('G');
+                                Socket.getOutputStream().write(Integer.valueOf(0));
+                                Socket.getOutputStream().write('B');
+                                Socket.getOutputStream().write(Integer.valueOf(0));
+                                red.setProgress(0);
+                                green.setProgress(0);
+                                blue.setProgress(0);
+                                Integer pr = 0;
+                                lumnred.setText(String.valueOf(progress));
+                                r.setText(String.valueOf(pr));
+                                lumngreen.setText(String.valueOf(progress));
+                                g.setText(String.valueOf(pr));
+                                lumnblue.setText(String.valueOf(progress));
+                                b.setText(String.valueOf(pr));
+                                pr_redR1 = 0;
+                                pr_redR2 = 0;
+                                pr_greenR1 = 0;
+                                pr_greenR2 = 0;
+                                pr_blueR1 = 0;
+                                pr_blueR2 = 0;
+                                pr_brightnessR1 = 10;
+                                pr_brightnessR2 = 10;
+                                temp_S1R1 = 1;
+                                temp_S2R1 = 0;
+                                temp_S3R1 = 0;
+                                temp_S4R1 = 0;
+                                temp_S5R1 = 0;
+                                temp_S6R1 = 0;
+                                btnS1.setTextColor(Color.RED);
+                                btnS1.setTextSize(22);
+                                Socket.getOutputStream().write('a');
+                            }
+                        }
+                        if(temp_ring==1) //ring2
+                        {
+                            if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
+                            {
+                                Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                            {
+                                Socket.getOutputStream().write('R');
+                                Socket.getOutputStream().write(Integer.valueOf(0));
+                                Socket.getOutputStream().write('G');
+                                Socket.getOutputStream().write(Integer.valueOf(0));
+                                Socket.getOutputStream().write('B');
+                                Socket.getOutputStream().write(Integer.valueOf(0));
+                                red.setProgress(0);
+                                green.setProgress(0);
+                                blue.setProgress(0);
+                                Integer pr = 0;
+                                lumnred.setText(String.valueOf(progress));
+                                r.setText(String.valueOf(pr));
+                                lumngreen.setText(String.valueOf(progress));
+                                g.setText(String.valueOf(pr));
+                                lumnblue.setText(String.valueOf(progress));
+                                b.setText(String.valueOf(pr));
+                                pr_redR1 = 0;
+                                pr_redR2 = 0;
+                                pr_greenR1 = 0;
+                                pr_greenR2 = 0;
+                                pr_blueR1 = 0;
+                                pr_blueR2 = 0;
+                                pr_brightnessR1 = 10;
+                                pr_brightnessR2 = 10;
+                                temp_S1R2 = 1;
+                                temp_S2R2 = 0;
+                                temp_S3R2 = 0;
+                                temp_S4R2 = 0;
+                                temp_S5R2 = 0;
+                                temp_S6R2 = 0;
+                                btnS1.setTextColor(Color.RED);
+                                btnS1.setTextSize(22);
+                                Socket.getOutputStream().write('a');
+                            }
+                        }
+                    }
                 }
                 catch (IOException e)
                 {
@@ -114,14 +218,112 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
         }
         });
 
-        btnS2.setOnClickListener(new OnClickListener(){  //Sequence2 - button
+        //Button - Sequence2
+        btnS2.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
                     try
                     {
-                        Socket.getOutputStream().write('b');
+                        if(btnS2.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"SEQUENCE IS ON", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        if(btnS1.getCurrentTextColor()==Color.RED || btnS3.getCurrentTextColor()==Color.RED ||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"TURN OFF THE OTHER SEQUENCE", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            if(temp_ring==0) //ring1
+                            {
+                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R1 = 0;
+                                    temp_S2R1 = 1;
+                                    temp_S3R1 = 0;
+                                    temp_S4R1 = 0;
+                                    temp_S5R1 = 0;
+                                    temp_S6R1 = 0;
+                                    btnS2.setTextColor(Color.RED);
+                                    btnS2.setTextSize(22);
+                                    Socket.getOutputStream().write('b');
+                                }
+                            }
+                            if(temp_ring==1) //ring2
+                            {
+                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R2 = 0;
+                                    temp_S2R2 = 1;
+                                    temp_S3R2 = 0;
+                                    temp_S4R2 = 0;
+                                    temp_S5R2 = 0;
+                                    temp_S6R2 = 0;
+                                    btnS2.setTextColor(Color.RED);
+                                    btnS2.setTextSize(22);
+                                    Socket.getOutputStream().write('b');
+                                }
+                            }
+                        }
                     }
                     catch (IOException e)
                     {
@@ -131,14 +333,112 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        btnS3.setOnClickListener(new OnClickListener(){  //Sequence3 - button
+        //Button - Sequence3
+        btnS3.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
                     try
                     {
-                        Socket.getOutputStream().write('c');
+                        if(btnS3.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"SEQUENCE IS ON", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"TURN OFF THE OTHER SEQUENCE", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            if(temp_ring==0) //ring1
+                            {
+                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R1 = 0;
+                                    temp_S2R1 = 0;
+                                    temp_S3R1 = 1;
+                                    temp_S4R1 = 0;
+                                    temp_S5R1 = 0;
+                                    temp_S6R1 = 0;
+                                    btnS3.setTextColor(Color.RED);
+                                    btnS3.setTextSize(22);
+                                    Socket.getOutputStream().write('c');
+                                }
+                            }
+                            if(temp_ring==1) //ring2
+                            {
+                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R2 = 0;
+                                    temp_S2R2 = 0;
+                                    temp_S3R2 = 1;
+                                    temp_S4R2 = 0;
+                                    temp_S5R2 = 0;
+                                    temp_S6R2 = 0;
+                                    btnS3.setTextColor(Color.RED);
+                                    btnS3.setTextSize(22);
+                                    Socket.getOutputStream().write('c');
+                                }
+                            }
+                        }
                     }
                     catch (IOException e)
                     {
@@ -148,14 +448,112 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        btnS4.setOnClickListener(new OnClickListener(){  //Sequence4 - button
+        //Button - Sequence4
+        btnS4.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
                     try
                     {
-                        Socket.getOutputStream().write('d');
+                        if(btnS4.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"SEQUENCE IS ON", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"TURN OFF THE OTHER SEQUENCE", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            if(temp_ring==0) //ring1
+                            {
+                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R1 = 0;
+                                    temp_S2R1 = 0;
+                                    temp_S3R1 = 0;
+                                    temp_S4R1 = 1;
+                                    temp_S5R1 = 0;
+                                    temp_S6R1 = 0;
+                                    btnS4.setTextColor(Color.RED);
+                                    btnS4.setTextSize(22);
+                                    Socket.getOutputStream().write('d');
+                                }
+                            }
+                            if(temp_ring==1) //ring2
+                            {
+                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R2 = 0;
+                                    temp_S2R2 = 0;
+                                    temp_S3R2 = 0;
+                                    temp_S4R2 = 1;
+                                    temp_S5R2 = 0;
+                                    temp_S6R2 = 0;
+                                    btnS4.setTextColor(Color.RED);
+                                    btnS4.setTextSize(22);
+                                    Socket.getOutputStream().write('d');
+                                }
+                            }
+                        }
                     }
                     catch (IOException e)
                     {
@@ -165,14 +563,112 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        btnS5.setOnClickListener(new OnClickListener(){  //Sequence5 - button
+        //Button - Sequence5
+        btnS5.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
                     try
                     {
-                        Socket.getOutputStream().write('e');
+                        if(btnS5.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"SEQUENCE IS ON", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"TURN OFF THE OTHER SEQUENCE", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            if(temp_ring==0) //ring1
+                            {
+                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R1 = 0;
+                                    temp_S2R1 = 0;
+                                    temp_S3R1 = 0;
+                                    temp_S4R1 = 0;
+                                    temp_S5R1 = 1;
+                                    temp_S6R1 = 0;
+                                    btnS5.setTextColor(Color.RED);
+                                    btnS5.setTextSize(22);
+                                    Socket.getOutputStream().write('e');
+                                }
+                            }
+                            if(temp_ring==1) //ring2
+                            {
+                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R2 = 0;
+                                    temp_S2R2 = 0;
+                                    temp_S3R2 = 0;
+                                    temp_S4R2 = 0;
+                                    temp_S5R2 = 1;
+                                    temp_S6R2 = 0;
+                                    btnS5.setTextColor(Color.RED);
+                                    btnS5.setTextSize(22);
+                                    Socket.getOutputStream().write('e');
+                                }
+                            }
+                        }
                     }
                     catch (IOException e)
                     {
@@ -182,14 +678,112 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        btnS6.setOnClickListener(new OnClickListener(){  //Sequence6 - button
+        //Button - Sequence6
+        btnS6.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
                     try
                     {
-                        Socket.getOutputStream().write('f');
+                        if(btnS6.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"SEQUENCE IS ON", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED)
+                        {
+                            Toast.makeText(getApplicationContext(),"TURN OFF THE OTHER SEQUENCE", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            if(temp_ring==0) //ring1
+                            {
+                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R1 = 0;
+                                    temp_S2R1 = 0;
+                                    temp_S3R1 = 0;
+                                    temp_S4R1 = 0;
+                                    temp_S5R1 = 0;
+                                    temp_S6R1 = 1;
+                                    btnS6.setTextColor(Color.RED);
+                                    btnS6.setTextSize(22);
+                                    Socket.getOutputStream().write('f');
+                                }
+                            }
+                            if(temp_ring==1) //ring2
+                            {
+                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
+                                {
+                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Socket.getOutputStream().write('R');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('G');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    Socket.getOutputStream().write('B');
+                                    Socket.getOutputStream().write(Integer.valueOf(0));
+                                    red.setProgress(0);
+                                    green.setProgress(0);
+                                    blue.setProgress(0);
+                                    Integer pr = 0;
+                                    lumnred.setText(String.valueOf(progress));
+                                    r.setText(String.valueOf(pr));
+                                    lumngreen.setText(String.valueOf(progress));
+                                    g.setText(String.valueOf(pr));
+                                    lumnblue.setText(String.valueOf(progress));
+                                    b.setText(String.valueOf(pr));
+                                    pr_redR1 = 0;
+                                    pr_redR2 = 0;
+                                    pr_greenR1 = 0;
+                                    pr_greenR2 = 0;
+                                    pr_blueR1 = 0;
+                                    pr_blueR2 = 0;
+                                    pr_brightnessR1 = 10;
+                                    pr_brightnessR2 = 10;
+                                    temp_S1R2 = 0;
+                                    temp_S2R2 = 0;
+                                    temp_S3R2 = 0;
+                                    temp_S4R2 = 0;
+                                    temp_S5R2 = 0;
+                                    temp_S6R2 = 1;
+                                    btnS6.setTextColor(Color.RED);
+                                    btnS6.setTextSize(22);
+                                    Socket.getOutputStream().write('f');
+                                }
+                            }
+                        }
                     }
                     catch (IOException e)
                     {
@@ -199,7 +793,8 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        btnDis.setOnClickListener(new OnClickListener()  //Disconnected - button (return to the first layout PairDev)
+        //Button - Disconnected (return to the first layout - PairDevice)
+        btnDis.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -208,27 +803,40 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-
-
-        brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { //brightness - button
+        //SeekBar - Brightness
+        brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser==true)
                 {
-                    lumn.setText(String.valueOf(progress));
-                    Integer pr=progress*10;
-                    l.setText(String.valueOf(pr)+ "%");
-
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('L'); //+Integer.valueOf(progress));
-
-                        Socket.getOutputStream().write(Integer.valueOf(progress));
-
+                        brightness.setProgress(10);
                     }
-                    catch (IOException e)
+                    else
                     {
-                        msg("Error");
+                        lumn.setText(String.valueOf(progress));
+                        Integer pr = progress * 10;
+
+                        if (temp_ring == 0) //ring1
+                        {
+                            pr_brightnessR1 = progress;
+                        }
+                        if (temp_ring == 1) //ring2
+                        {
+                            pr_brightnessR2 = progress;
+                        }
+                        l.setText(String.valueOf(pr) + "%");
+
+                        try {
+                            Socket.getOutputStream().write('L');
+
+                            Socket.getOutputStream().write(Integer.valueOf(progress));
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
@@ -242,29 +850,42 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-
-        red.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {  //red-seekbar - button
+        //SeekBar - Red Color
+        red.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar2, int progress, boolean fromUser) {
                 if (fromUser==true)
                 {
-                    lumnred.setText(String.valueOf(progress));
-                    Integer pr=progress*4-1;
-                    if(pr==-1)
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        pr=pr+1;
+                        red.setProgress(0);
                     }
-                    r.setText(String.valueOf(pr));
-                    try
+                    else
                     {
-                        // String Str2 = new String (Str1.getBytes( "UTF-8" ));
-                        // Socket.getOutputStream().write(Str2.getBytes());
-                        Socket.getOutputStream().write('R');
-                        Socket.getOutputStream().write(Integer.valueOf(progress));
-                    }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                        lumnred.setText(String.valueOf(progress));
+                        Integer pr = progress * 4 - 1;
+
+                        if (temp_ring == 0)
+                        {
+                            pr_redR1 = progress;
+                        }
+                        if (temp_ring == 1)
+                        {
+                            pr_redR2 = progress;
+                        }
+                        if (pr == -1) {
+                            pr = pr + 1;
+                        }
+                        r.setText(String.valueOf(pr));
+                        try
+                        {
+                            Socket.getOutputStream().write('R');
+                            Socket.getOutputStream().write(Integer.valueOf(progress));
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
@@ -278,26 +899,43 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        green.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {  //green-seekbar - button
+        //SeekBar - Green Color
+        green.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar3, int progress, boolean fromUser) {
                 if (fromUser==true)
                 {
-                    lumngreen.setText(String.valueOf(progress));
-                    Integer pr=progress*4-1;
-                    if(pr==-1)
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        pr=pr+1;
+                        green.setProgress(0);
                     }
-                    g.setText(String.valueOf(pr));
-                    try
+                    else
                     {
-                        Socket.getOutputStream().write('G');
-                        Socket.getOutputStream().write(Integer.valueOf(progress));
-                    }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                        lumngreen.setText(String.valueOf(progress));
+                        Integer pr = progress * 4 - 1;
+
+                        if (temp_ring == 0)
+                        {
+                            pr_greenR1 = progress;
+                        }
+                        if (temp_ring == 1)
+                        {
+                            pr_greenR2 = progress;
+                        }
+                        if (pr == -1)
+                        {
+                            pr = pr + 1;
+                        }
+                        g.setText(String.valueOf(pr));
+                        try
+                        {
+                            Socket.getOutputStream().write('G');
+                            Socket.getOutputStream().write(Integer.valueOf(progress));
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
@@ -311,29 +949,45 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        blue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {   //blue-seekbar - button
+        //SeekBar - Blue Color
+        blue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar4, int progress, boolean fromUser) {
                 if (fromUser==true)
                 {
-                    lumnblue.setText(String.valueOf(progress));
-                    Integer pr=progress*4-1;
-                    if(pr==-1)
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        pr=pr+1;
+                        blue.setProgress(0);
                     }
-                    b.setText(String.valueOf(pr));
-                    try
+                    else
                     {
-                        Socket.getOutputStream().write('B');
-                        Socket.getOutputStream().write(Integer.valueOf(progress));
-                    }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                        lumnblue.setText(String.valueOf(progress));
+                        Integer pr = progress * 4 - 1;
+
+                        if (temp_ring == 0)
+                        {
+                            pr_blueR1 = progress;
+                        }
+                        if (temp_ring == 1)
+                        {
+                            pr_blueR2 = progress;
+                        }
+                        if (pr == -1)
+                        {
+                            pr = pr + 1;
+                        }
+                        b.setText(String.valueOf(pr));
+                        try
+                        {
+                            Socket.getOutputStream().write('B');
+                            Socket.getOutputStream().write(Integer.valueOf(progress));
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
-
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -345,137 +999,266 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             }
         });
 
-        c1.setOnClickListener(new OnClickListener(){  //color1
+        //Button - Color1
+        c1.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('g');
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE", Toast.LENGTH_SHORT).show();
                     }
-                    catch (IOException e)
+                    else
                     {
-                        msg("Error");
-                    }
-                }
-            }
-        });
-        c2.setOnClickListener(new OnClickListener(){  //color2
-            public void onClick(View v)
-            {
-                if (Socket!=null)
-                {
-                    try
-                    {
-                        Socket.getOutputStream().write('h');
-                    }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                        try
+                        {
+                            Socket.getOutputStream().write('g');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
         });
 
-        c3.setOnClickListener(new OnClickListener(){  //color3
+        //Button - Color2
+        c2.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('i');
+                        Toast.makeText(getApplicationContext(),"TURN OFF SEQUENCE", Toast.LENGTH_SHORT).show();
                     }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                    else
+                        {
+                        try
+                        {
+                            Socket.getOutputStream().write('h');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
         });
 
-        c4.setOnClickListener(new OnClickListener(){  //color4
+        //Button - Color3
+        c3.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('j');
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE", Toast.LENGTH_SHORT).show();
                     }
-                    catch (IOException e)
+                    else
                     {
-                        msg("Error");
+                        try
+                        {
+                            Socket.getOutputStream().write('i');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
         });
 
-        c5.setOnClickListener(new OnClickListener(){  //color5
+        //Button - Color4
+        c4.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('k');
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE", Toast.LENGTH_SHORT).show();
                     }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                    else
+                        {
+                        try
+                        {
+                            Socket.getOutputStream().write('j');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
         });
 
-        c6.setOnClickListener(new OnClickListener(){  //color6
+        //Button - Color5
+        c5.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('l');
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE", Toast.LENGTH_SHORT).show();
                     }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                    else
+                        {
+                        try
+                        {
+                            Socket.getOutputStream().write('k');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
         });
 
-        c7.setOnClickListener(new OnClickListener(){  //color7
+        //Button - Color6
+        c6.setOnClickListener(new OnClickListener(){
             public void onClick(View v)
             {
                 if (Socket!=null)
                 {
-                    try
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
                     {
-                        Socket.getOutputStream().write('m');
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE", Toast.LENGTH_SHORT).show();
                     }
-                    catch (IOException e)
-                    {
-                        msg("Error");
+                    else
+                        {
+                        try
+                        {
+                            Socket.getOutputStream().write('l');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
                     }
                 }
             }
-
         });
 
-        ringnumber.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){  //SELECT RING NUMBER - default Ring1
+        //Button - Color7
+        c7.setOnClickListener(new OnClickListener(){
+            public void onClick(View v)
+            {
+                if (Socket!=null)
+                {
+                    if(btnS1.getCurrentTextColor()==Color.RED || btnS2.getCurrentTextColor()==Color.RED ||btnS3.getCurrentTextColor()==Color.RED||btnS4.getCurrentTextColor()==Color.RED||btnS5.getCurrentTextColor()==Color.RED||btnS6.getCurrentTextColor()==Color.RED)
+                    {
+                        Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                        {
+                        try
+                        {
+                            Socket.getOutputStream().write('m');
+                        }
+                        catch (IOException e)
+                        {
+                            msg("Error");
+                        }
+                    }
+                }
+            }
+        });
 
+        //SeekBar - SELECT RING NUMBER (default Ring1)
+        ringnumber.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
                 if (fromUser==true)
                 {
                     if(progress==0)
-
                         try
                         {
+                            //Reset sekwencji
+                            btnS1.setTextColor(Color.BLACK);
+                            btnS1.setTextSize(14);
+                            btnS2.setTextColor(Color.BLACK);
+                            btnS2.setTextSize(14);
+                            btnS3.setTextColor(Color.BLACK);
+                            btnS3.setTextSize(14);
+                            btnS4.setTextColor(Color.BLACK);
+                            btnS4.setTextSize(14);
+                            btnS5.setTextColor(Color.BLACK);
+                            btnS5.setTextSize(14);
+                            btnS6.setTextColor(Color.BLACK);
+                            btnS6.setTextSize(14);
+
+                            if(temp_S1R1==1)
+                            {
+                                btnS1.setTextColor(Color.RED);
+                                btnS1.setTextSize(22);
+                            }
+                            if(temp_S2R1==1)
+                            {
+                                btnS2.setTextColor(Color.RED);
+                                btnS2.setTextSize(22);
+                            }
+                            if(temp_S3R1==1)
+                            {
+                                btnS3.setTextColor(Color.RED);
+                                btnS3.setTextSize(22);
+                            }
+                            if(temp_S4R1==1)
+                            {
+                                btnS4.setTextColor(Color.RED);
+                                btnS4.setTextSize(22);
+                            }
+                            if(temp_S5R1==1)
+                            {
+                                btnS5.setTextColor(Color.RED);
+                                btnS5.setTextSize(22);
+                            }
+                            if(temp_S6R1==1)
+                            {
+                                btnS6.setTextColor(Color.RED);
+                                btnS6.setTextSize(22);
+                            }
+                            //brightness ring1
+                            brightness.setProgress(pr_brightnessR1);
+                            lumn.setText(String.valueOf(progress));
+                            l.setText(String.valueOf(pr_brightnessR1*10+ "%"));
+                            //red ring1
+                            red.setProgress(pr_redR1);
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(pr_redR1*4-1));
+                            if(pr_redR1*4-1==-1)
+                            {
+                                r.setText(String.valueOf(0));
+                            }
+                            //green ring1
+                            green.setProgress(pr_greenR1);
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(pr_greenR1*4-1));
+                            if(pr_greenR1*4-1==-1)
+                            {
+                                g.setText(String.valueOf(0));
+                            }
+                            //blue ring1
+                            blue.setProgress(pr_blueR1);
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(pr_blueR1*4-1));
+                            if(pr_blueR1*4-1==-1)
+                            {
+                                b.setText(String.valueOf(0));
+                            }
+                            Toast.makeText(getApplicationContext(),"SELECTED: Ring1", Toast.LENGTH_SHORT).show();
                             Socket.getOutputStream().write('x');
+                            temp_ring=0;
                         }
                         catch (IOException e)
                         {
@@ -485,7 +1268,82 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
                     {
                         try
                         {
+                            //Reset sekwencji
+                            btnS1.setTextColor(Color.BLACK);
+                            btnS1.setTextSize(14);
+                            btnS2.setTextColor(Color.BLACK);
+                            btnS2.setTextSize(14);
+                            btnS3.setTextColor(Color.BLACK);
+                            btnS3.setTextSize(14);
+                            btnS4.setTextColor(Color.BLACK);
+                            btnS4.setTextSize(14);
+                            btnS5.setTextColor(Color.BLACK);
+                            btnS5.setTextSize(14);
+                            btnS6.setTextColor(Color.BLACK);
+                            btnS6.setTextSize(14);
+
+                            if(temp_S1R2==1)
+                            {
+                                btnS1.setTextColor(Color.RED);
+                                btnS1.setTextSize(22);
+                            }
+                            if(temp_S2R2==1)
+                            {
+                                btnS2.setTextColor(Color.RED);
+                                btnS2.setTextSize(22);
+                            }
+                            if(temp_S3R2==1)
+                            {
+                                btnS3.setTextColor(Color.RED);
+                                btnS3.setTextSize(22);
+                            }
+                            if(temp_S4R2==1)
+                            {
+                                btnS4.setTextColor(Color.RED);
+                                btnS4.setTextSize(22);
+                            }
+                            if(temp_S5R2==1)
+                            {
+                                btnS5.setTextColor(Color.RED);
+                                btnS5.setTextSize(22);
+                            }
+                            if(temp_S6R2==1)
+                            {
+                                btnS6.setTextColor(Color.RED);
+                                btnS6.setTextSize(22);
+                            }
+
+                            //brightness ring2
+                            brightness.setProgress(pr_brightnessR2);
+                            lumn.setText(String.valueOf(progress));
+                            l.setText(String.valueOf(pr_brightnessR2*10+ "%"));
+                            //red ring2
+                            red.setProgress(pr_redR2);
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(pr_redR2*4-1));
+                            if(pr_redR2*4-1==-1)
+                            {
+                                r.setText(String.valueOf(0));
+                            }
+                            //green ring2
+                            green.setProgress(pr_greenR2);
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(pr_greenR2*4-1));
+                            if(pr_greenR2*4-1==-1)
+                            {
+                                g.setText(String.valueOf(0));
+                            }
+                            //blue ring2
+                            blue.setProgress(pr_blueR2);
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(pr_blueR2*4-1));
+                            if(pr_blueR2*4-1==-1)
+                            {
+                                b.setText(String.valueOf(0));
+                            }
+                            Toast.makeText(getApplicationContext(),"SELECTED: Ring2", Toast.LENGTH_SHORT).show();
                             Socket.getOutputStream().write('y');
+                            temp_ring=1;
                         }
                         catch (IOException e)
                         {
@@ -505,28 +1363,11 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
 
             }
         });
-
     }
-
-
-    //SPINNER
-   // @Override
-    //public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-   //     TextView myText= (TextView) view;
-   //     Toast.makeText(this,"You Selceted "+myText.getText(),Toast.LENGTH_SHORT).show();
-
-
-   // }
-
-   // @Override
-    //public void onNothingSelected(AdapterView<?> parent) {
-
-   // }
 
     private void Disconnect()
     {
-        if (Socket!=null) //If the btSocket is busy
+        if (Socket!=null)
         {
             try
             {
@@ -536,10 +1377,9 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
             { msg("Error");}
         }
         finish(); //return to the first layout(paired)
-
     }
 
-    private void turnOffLed()  //Procedure TurnOff
+    public void turnOffLed()
     {
         if (Socket!=null)
             {
@@ -550,7 +1390,43 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
                     blue.setProgress(0);
                     changevar();
                     Socket.getOutputStream().write('O');
-
+                    if(temp_ring==0)
+                    {
+                        pr_redR1=0;
+                        pr_greenR1=0;
+                        pr_blueR1=0;
+                        temp_S1R1=0;
+                        temp_S2R1=0;
+                        temp_S3R1=0;
+                        temp_S4R1=0;
+                        temp_S5R1=0;
+                        temp_S6R1=0;
+                    }
+                    else
+                    {
+                        pr_redR2=0;
+                        pr_greenR2=0;
+                        pr_blueR2=0;
+                        temp_S1R2=0;
+                        temp_S2R2=0;
+                        temp_S3R2=0;
+                        temp_S4R2=0;
+                        temp_S5R2=0;
+                        temp_S6R2=0;
+                    }
+                    //Reset sekwencji
+                    btnS1.setTextColor(Color.BLACK);
+                    btnS1.setTextSize(14);
+                    btnS2.setTextColor(Color.BLACK);
+                    btnS2.setTextSize(14);
+                    btnS3.setTextColor(Color.BLACK);
+                    btnS3.setTextSize(14);
+                    btnS4.setTextColor(Color.BLACK);
+                    btnS4.setTextSize(14);
+                    btnS5.setTextColor(Color.BLACK);
+                    btnS5.setTextSize(14);
+                    btnS6.setTextColor(Color.BLACK);
+                    btnS6.setTextSize(14);
                 }
                 catch (IOException e)
                 {
@@ -558,6 +1434,7 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
                 }
         }
     }
+
     public void changevar()  //WYRESETOWANIE WSZYSTKICH WARTOSCI- USATWIENIE SEEKBARÓW NA wart. pocz.
     {
                     Integer pr=0;
@@ -567,7 +1444,6 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
                     g.setText(String.valueOf(pr));
                     lumnblue.setText(String.valueOf(progress));
                     b.setText(String.valueOf(pr));
-
                     try
                     {
                         Socket.getOutputStream().write('R');
@@ -591,61 +1467,55 @@ public class ledControl extends ActionBarActivity { //implements AdapterView.OnI
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_led_control, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
 
-
-
-    private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
+    private class ConnectBT extends AsyncTask<Void, Void, Void>
     {
-        private boolean ConnectSuccess = true; //if it's here, it's almost connected
+        private boolean ConnectSuccess = true;
 
         @Override
         protected void onPreExecute()
         {
-            progress = ProgressDialog.show(ledControl.this, "Connecting...", "Please wait!!!");  //show a progress dialog
+            progress = ProgressDialog.show(ledControl.this, "Connecting...", "Please wait!!!");
         }
 
         @Override
-        protected Void doInBackground(Void... devices) //while the progress dialog is shown, the connection is done in background
+        protected Void doInBackground(Void... devices)
         {
             try
             {
                 if (Socket == null || !isBtConnected)
                 {
-                 myBluetooth = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
-                 BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
-                 Socket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+                 myBluetooth = BluetoothAdapter.getDefaultAdapter();
+                 BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);
+                 Socket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);
                  BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                  Socket.connect();//start connection
                 }
             }
             catch (IOException e)
             {
-                ConnectSuccess = false;//if the try failed, you can check the exception here
+                ConnectSuccess = false;
             }
             return null;
         }
         @Override
-        protected void onPostExecute(Void result) //after the doInBackground, it checks if everything went fine
+        protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
 
