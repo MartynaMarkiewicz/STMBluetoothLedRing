@@ -21,6 +21,8 @@
 #include <time.h>
 #include "ws2812.h"
 
+
+
 #define false 0
 #define true 1
 
@@ -59,6 +61,18 @@ void gpio();
 void usart();
 void setBrightness(uint8_t x);
 uint8_t getBrightness(void);
+
+void reset()
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOE, &GPIO_InitStructure);
+}
 
 void rcc()
 {
@@ -127,6 +141,7 @@ void usart()
 void setBrightness(uint8_t x)
 {
   uint8_t newBrightness = x + 1;
+  uint8_t newBrightness2 = x + 1;
 
   // RING_1
   	  if(newBrightness != brightness)
@@ -145,23 +160,28 @@ void setBrightness(uint8_t x)
   		  }
   		  brightness = newBrightness;
   	  }
+}
+
+void setBrightness2(uint8_t x)
+{
+  uint8_t newBrightness2 = x + 1;
 
   // RING_2
-  	  if(newBrightness != brightness2)
+  	  if(newBrightness2 != brightness2)
   	  {
-  		  uint8_t  c,
-             *ptr           = pixels,
-              oldBrightness = brightness2 - 1;
+  		  uint8_t  c1,
+            *ptr           = pixels,
+             oldBrightness2 = brightness2 - 1;
   		  uint16_t scale;
-  		  if(oldBrightness == 0) scale = 0;
-  		  else if(x == 255) scale = 65535 / oldBrightness;
-  		  else scale = (((uint16_t)newBrightness << 8) - 1) / oldBrightness;
+  		  if(oldBrightness2 == 0) scale = 0;
+  		  else if(x == 255) scale = 65535 / oldBrightness2;
+  		  else scale = (((uint16_t)newBrightness2 << 8) - 1) / oldBrightness2;
   		  for(uint16_t i=0; i<3; i++)
   		  {
-  			  c      = *ptr;
-  			  *ptr++ = (c * scale) >> 8;
+  			  c1      = *ptr;
+  			  *ptr++ = (c1 * scale) >> 8;
   		  }
-  		  brightness2 = newBrightness;
+  		  brightness2 = newBrightness2;
   	  }
 }
 
@@ -213,7 +233,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c==0)
 				red_p=0;
-				if (c >= 1 && c <= 255&&c!=76&&c!=71&&c!=66)
+				if (c >= 1 && c <= 255&&c!=76&&c!=71&&c!=66&&c!=120&&c!=121&&c!=97&&c!=98&&c!=99&&c!=100&&c!=101&&c!=102&&c!=103&&c!=104&&c!=105&&c!=106&&c!=107&&c!=108&&c!=109)
 				{
 					red_p = c*4-1;
 					red_br=red_p;
@@ -224,7 +244,7 @@ void USART3_IRQHandler(void)
 
 			if(USART3->DR == 'G')
 			{
-				brightness=100;
+				brightness=101;
 				green_p = 0;
 				k = 1;
 			}
@@ -232,7 +252,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c<1)
 				green_p=0;
-				if (c >= 1 && c <= 255&&c!=76&&c!=82&&c!=66)
+				if (c >= 1 && c <= 255&&c!=76&&c!=82&&c!=66&&c!=120&&c!=121&&c!=97&&c!=98&&c!=99&&c!=100&&c!=101&&c!=102&&c!=103&&c!=104&&c!=105&&c!=106&&c!=107&&c!=108&&c!=109)
 				{
 					green_p = c*4-1;
 					green_br=green_p;
@@ -251,7 +271,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c<1)
 				blue_p=0;
-				if (c >= 1 && c <= 255&&c!=76&&c!=82&&c!=71)
+				if (c >= 1 && c <= 255&&c!=76&&c!=82&&c!=71&&c!=120&&c!=121&&c!=97&&c!=98&&c!=99&&c!=100&&c!=101&&c!=102&&c!=103&&c!=104&&c!=105&&c!=106&&c!=107&&c!=108&&c!=109)
 				{
 					blue_p = c*4-1;
 					blue_br=blue_p;
@@ -262,29 +282,7 @@ void USART3_IRQHandler(void)
 			// RGB - RING_1
 			rgb(red_p, green_p,blue_p);
 
-			if(brightness)
-			{
-				if(red_br==327)
-				{
-					red_br=0;
-				}
-				if(green_br==283)
-				{
-					green_br=0;
-				}
-				if(blue_br==263)
-				{
-					blue_br=0;
-				}
-				int i=0;
 
-				for(i=0;i<8;i++)
-				{
-					diode[i].red=(red_br* brightness) >> 8;
-					diode[i].green=(green_br* brightness) >> 8;
-					diode[i].blue=(blue_br* brightness) >> 8;
-				}
-			}
 			// KOLORY - RING_1
 			if(USART3->DR == 'g')
 			{
@@ -386,6 +384,31 @@ void USART3_IRQHandler(void)
 				blue_p=0;
 				zmienna_usart6=1;
 			}
+
+			if(brightness)
+						{
+							if(red_br==327)
+							{
+								red_br=0;
+							}
+							if(green_br==283)
+							{
+								green_br=0;
+							}
+							if(blue_br==263)
+							{
+								blue_br=0;
+							}
+							int i=0;
+
+							for(i=0;i<8;i++)
+							{
+								diode[i].red=(red_br* brightness) >> 8;
+								diode[i].green=(green_br* brightness) >> 8;
+								diode[i].blue=(blue_br* brightness) >> 8;
+							}
+						}
+
 			// TURN OFF
 			if(USART3->DR == 'O')
 			{
@@ -425,11 +448,11 @@ void USART3_IRQHandler(void)
 			{
 				if(c1==0)
 				y=0;
-				if (c1 >= 1 && c1 <= 100&&c1!=82&&c1!=71&&c1!=66&&c1!=97&&c1!=98&&c1!=99&&c1!=100)
+				if (c1 >= 1 && c1 <= 100 && c1!=82 && c1!=71 && c1!=66 && c1!=97 && c1!=98 && c1!=99 && c1!=100)
 				y = c1*10;
 				else
 				y2=0;
-				setBrightness(y);
+				setBrightness2(y);
 			}
 
 			if(USART3->DR == 'R')
@@ -442,7 +465,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c1==0)
 				red_p2=0;
-				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=71&&c1!=66)
+				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=71&&c1!=66&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109)
 				{
 					red_p2 = c1*4-1;
 					red_br2=red_p2;
@@ -461,7 +484,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c1<1)
 				green_p2=0;
-				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=82&&c1!=66)
+				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=82&&c1!=66&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109)
 				{
 					green_p2 = c1*4-1;
 					green_br2=green_p2;
@@ -480,7 +503,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c1<1)
 				blue_p2=0;
-				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=82&&c1!=71)
+				if (c1 >= 1 && c1 <= 255 && c1!=76 && c1!=82 && c1!=71&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109)
 				{
 					blue_p2 = c1*4-1;
 					blue_br2=blue_p2;
@@ -491,29 +514,7 @@ void USART3_IRQHandler(void)
 			// RGB - RING_2
 			rgb2(red_p2, green_p2,blue_p2);
 
-			if(brightness2)
-			{
-				if(red_br2==327)
-				{
-					red_br2=0;
-				}
-				if(green_br2==283)
-				{
-					green_br2=0;
-				}
-				if(blue_br2==263)
-				{
-					blue_br2=0;
-				}
-				int i=0;
 
-				for(i=8;i<16;i++)
-				{
-					diode[i].red=(red_br2* brightness2) >> 8;
-					diode[i].green=(green_br2* brightness2) >> 8;
-					diode[i].blue=(blue_br2* brightness2) >> 8;
-				}
-			}
 			// KOLORY - RING_2
 			if(USART3->DR == 'g')
 			{
@@ -615,11 +616,33 @@ void USART3_IRQHandler(void)
 				blue_p2=0;
 				zmienna_usart62=1;
 			}
+			if(brightness2)
+					{
+						if(red_br2==327)
+						{
+							red_br2=0;
+						}
+						if(green_br2==283)
+						{
+							green_br2=0;
+						}
+						if(blue_br2==263)
+						{
+							blue_br2=0;
+						}
+						int i=8;
+
+						for(i=8;i<16;i++)
+						{
+							diode[i].red=(red_br2* brightness2) >> 8;
+							diode[i].green=(green_br2* brightness2) >> 8;
+							diode[i].blue=(blue_br2* brightness2) >> 8;
+						}
+					}
 			// TURN OFF
 			if(USART3->DR == 'O')
 			{
 				turn_led2=1;
-				clear_app(8,16);
 				red_br2=0;
 				green_br2=0;
 				blue_br2=0;
@@ -644,7 +667,7 @@ int main(void)
 	{
 		if(zmienna_usart1==1)
 		{
-			seq1(0,8);
+			seq11(0,8);
 			if(turn_led==1)
 			{
 				zmienna_usart1=0;
@@ -652,14 +675,16 @@ int main(void)
 				turn_led=0;
 			}
 		}
+
+
 		if(zmienna_usart2==1)
 		{
 			seq2(0,8);
 			if(turn_led==1)
 			{
-				zmienna_usart2=0;
 				clear_app(0,8);
 				turn_led=0;
+				zmienna_usart2=0;
 			}
 		}
 		if(zmienna_usart3==1)
@@ -667,9 +692,9 @@ int main(void)
 			seq3(0,8);
 			if(turn_led==1)
 			{
-				zmienna_usart3=0;
 				clear_app(0,8);
 				turn_led=0;
+				zmienna_usart3=0;
 			}
 		}
 		if(zmienna_usart4==1)
@@ -677,9 +702,9 @@ int main(void)
 			seq10(0,8);
 			if(turn_led==1)
 			{
-				zmienna_usart4=0;
 				clear_app(0,8);
 				turn_led=0;
+				zmienna_usart4=0;
 			}
 		}
 		if(zmienna_usart5==1)
@@ -687,9 +712,9 @@ int main(void)
 			seq7(0,8);
 			if(turn_led==1)
 			{
-				zmienna_usart5=0;
 				clear_app(0,8);
 				turn_led=0;
+				zmienna_usart5=0;
 			}
 		}
 		if(zmienna_usart6==1)
@@ -697,21 +722,21 @@ int main(void)
 			seq6(0,8);
 			if(turn_led==1)
 			{
-				zmienna_usart6=0;
 				clear_app(0,8);
 				turn_led=0;
+				zmienna_usart6=0;
 			}
 		}
 
 		//////////////////RING2///////////////////////////
 		if(zmienna_usart12==1)
 		{
-			seq1(8,16);
+			seq112(8,16);
 			if(turn_led2==1)
 			{
-				zmienna_usart12=0;
 				clear_app(8,16);
 				turn_led2=0;
+				zmienna_usart12=0;
 			}
 		}
 		if(zmienna_usart22==1)
@@ -719,9 +744,9 @@ int main(void)
 			seq2(8,16);
 			if(turn_led2==1)
 			{
-				zmienna_usart22=0;
 				clear_app(8,16);
 				turn_led2=0;
+				zmienna_usart22=0;
 			}
 		}
 		if(zmienna_usart32==1)
@@ -729,9 +754,9 @@ int main(void)
 			seq3(8,16);
 			if(turn_led2==1)
 			{
-				zmienna_usart32=0;
 				clear_app(8,16);
 				turn_led2=0;
+				zmienna_usart32=0;
 			}
 		}
 		if(zmienna_usart42==1)
@@ -739,9 +764,9 @@ int main(void)
 			seq9(8,16);
 			if(turn_led2==1)
 			{
-				zmienna_usart42=0;
 				clear_app(8,16);
 				turn_led2=0;
+				zmienna_usart42=0;
 			}
 		}
 		if(zmienna_usart52==1)
@@ -749,9 +774,9 @@ int main(void)
 			seq8(8,16);
 			if(turn_led2==1)
 			{
-				zmienna_usart52=0;
 				clear_app(8,16);
 				turn_led2=0;
+				zmienna_usart52=0;
 			}
 		}
 		if(zmienna_usart62==1)
@@ -759,9 +784,9 @@ int main(void)
 			seq6(8,16);
 			if(turn_led2==1)
 			{
-				zmienna_usart62=0;
 				clear_app(8,16);
 				turn_led2=0;
+				zmienna_usart62=0;
 			}
 		}
 	}
