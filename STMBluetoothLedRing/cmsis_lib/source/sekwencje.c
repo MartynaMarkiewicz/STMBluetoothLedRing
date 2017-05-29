@@ -31,6 +31,7 @@ void seq1(int k, int j)
 
 void seq2(int k, int j)
 {
+
 	int i=0;
 	for(i=k;i<j;i++)
 	{
@@ -69,6 +70,7 @@ void seq2(int k, int j)
 		diode[i].blue=75;
 		delay_ms(100);
 	}
+
 }
 
 void seq3(int k, int j)
@@ -555,4 +557,126 @@ void seq10(int k, int j)
 		clear_s(150);
 	}
 }
+
+void seq11(int k, int j)
+{
+	int x=5;
+	while(x<255)
+	{
+			diode[0].blue=x;
+			diode[1].blue=x;
+			diode[2].blue=x;
+			diode[3].blue=x;
+			diode[4].blue=x;
+			diode[5].blue=x;
+			diode[6].blue=x;
+			diode[7].blue=x;
+			x+=10;
+			delay_ms(150);
+	}
+		while(x>1)
+		{
+			diode[0].blue=x;
+			diode[1].blue=x;
+			diode[2].blue=x;
+			diode[3].blue=x;
+			diode[4].blue=x;
+			diode[5].blue=x;
+			diode[6].blue=x;
+			diode[7].blue=x;
+			x-=10;
+			delay_ms(150);
+		}
+
+//wiecej kolorow
+//	x=5;
+//	while(x<255)
+//	{
+//
+//
+//		diode[0].red=x; diode[0].blue=25;
+//		diode[1].red=x;	diode[1].blue=25;
+//		diode[2].red=x;	diode[2].blue=25;
+//		diode[3].red=x;	diode[3].blue=25;
+//		diode[4].red=x;	diode[4].blue=25;
+//		diode[5].red=x;	diode[5].blue=25;
+//		diode[6].red=x;	diode[6].blue=25;
+//		diode[7].red=x;	diode[7].blue=25;
+//		x+=10;
+//		delay_ms(150);
+//	}
+//	while(x>0)
+//	{
+//				diode[0].red=x; diode[0].blue=25;
+//				diode[1].red=x;	diode[1].blue=25;
+//				diode[2].red=x;	diode[2].blue=25;
+//				diode[3].red=x;	diode[3].blue=25;
+//				diode[4].red=x;	diode[4].blue=25;
+//				diode[5].red=x;	diode[5].blue=25;
+//				diode[6].red=x;	diode[6].blue=25;
+//				diode[7].red=x;	diode[7].blue=25;
+//			x-=10;
+//			delay_ms(150);
+//	}
+//	x=5;
+//	while(x<255)
+//	{
+//		diode[0].red=x; diode[0].green=51;
+//		diode[1].red=x;	diode[1].green=51;
+//		diode[2].red=x;	diode[2].green=51;
+//		diode[3].red=x;	diode[3].green=51;
+//		diode[4].red=x;	diode[4].green=51;
+//		diode[5].red=x;	diode[5].green=51;
+//		diode[6].red=x;	diode[6].green=51;
+//		diode[7].red=x;	diode[7].green=51;
+//		x+=10;
+//		delay_ms(150);
+//	}
+//	while(x>0)
+//	{
+//		diode[0].red=x; diode[0].green=51;
+//		diode[1].red=x;	diode[1].green=51;
+//		diode[2].red=x;	diode[2].green=51;
+//		diode[3].red=x;	diode[3].green=51;
+//		diode[4].red=x;	diode[4].green=51;
+//		diode[5].red=x;	diode[5].green=51;
+//		diode[6].red=x;	diode[6].green=51;
+//		diode[7].red=x;	diode[7].green=51;
+//			x-=10;
+//			delay_ms(150);
+//	}
+}
+
+void seq112(int k, int j)
+{
+	int x=5;
+	while(x<255)
+	{
+
+			diode[8].blue=x;
+			diode[9].blue=x;
+			diode[10].blue=x;
+			diode[11].blue=x;
+			diode[12].blue=x;
+			diode[13].blue=x;
+			diode[14].blue=x;
+			diode[15].blue=x;
+			x+=10;
+			delay_ms(150);
+	}
+		while(x>1)
+		{
+			diode[8].blue=x;
+			diode[9].blue=x;
+			diode[10].blue=x;
+			diode[11].blue=x;
+			diode[12].blue=x;
+			diode[13].blue=x;
+			diode[14].blue=x;
+			diode[15].blue=x;
+			x-=10;
+			delay_ms(150);
+		}
+}
+
 
