@@ -10,24 +10,24 @@ The output form the first ring (Do) is directly connected to the input of the se
 The power supply (+5V, GND) of the first and the second ring is directly connected to the +5V external power supply.
 The power supply (+5V, GND) coming out of the STM board is connected to the +5V external power supply.
 
-Projects components
-  -STM32F4xxx DISCOVERY
-	-Bluetooth module HC-06
-  -2x LED RING RGB WS2812B 5050 x 8 diode - 32mm
+Projects components:<br />
+	-STM32F4xxx DISCOVERY <br />
+	-Bluetooth module HC-06 <br />
+	-2x LED RING RGB WS2812B 5050 x 8 diode - 32mm <br />
 
 ### Tools: 
 CooCox CoIDE 1.7.8 - language C  
 Android Studio 2.3 - language JAVA
 
 ### How to run:
-Connections:
-		-Bluetooth module HC-06:
-        RxD-->PC10, 
-        TxD-->PC11, 
-        GND-->GND,       
-        VCC-->5V
-		-LED RING RGB WS2812B: 
-        DI-->PC9
+Connections:<br />
+	-Bluetooth module HC-06:<br />
+        	RxD-->PC10, <br />
+		TxD-->PC11, <br />
+        	GND-->GND, <br />      
+        	VCC-->5V<br />
+	-LED RING RGB WS2812B:<br /> 
+        	DI-->PC9<br />
 	
 Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)
 ![alt tag](http://i.imgur.com/9qvkqrC.png) 
@@ -54,7 +54,7 @@ Improvements:
     -controlling the brightness  of sequences 
     -adding new sequences
     
-There is one bug.
+There is a one bug.
 While switching between the two rings, when the sequence is on, a glimpse can be seen.
 
 
