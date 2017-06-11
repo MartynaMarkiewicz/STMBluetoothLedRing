@@ -24,8 +24,8 @@ Connections:<br />
 	-Bluetooth module HC-06:<br />
         	RxD-->PC10, <br />
 		TxD-->PC11, <br />
-        	GND-->GND,<br />      
-        	VCC-->5V<br />
+        	GND-->GND,      
+        	VCC-->5V<br /><br />
 	-LED RING RGB WS2812B:<br /> 
         	DI-->PC9<br />
 	
@@ -43,7 +43,7 @@ Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the 
 An application project:<br />
     -Clone and compile project (e.g. Android Studio)<br />
     -Generate .apk file<br />
-    -Install an application on a mobile phone<br />
+    -Install an application on a mobile phone<br /><br />
 An STM project:<br />
     -Clone, compile project and flash to STM (e.g. CooCox)
  	
@@ -69,5 +69,5 @@ Distributed under MIT license
 Piotr Goździewski,<br />
 Martyna Markiewicz
 
-The project was conducted during the Microprocessor Lab course held by the Institute of Control and Information Engineering, Poznan University of Technology.
+The project was conducted during the Microprocessor Lab course held by the Institute of Control and Information Engineering, Poznan University of Technology.<br />
 Supervisor: Tomasz Mańkowski
