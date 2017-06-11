@@ -1,10 +1,7 @@
 #include "stm32f4xx_conf.h"
 #include <stm32f4xx.h>
-#include <clear.h>
 #include <colours.h>
 #include <ctype.h>
-#include "delay.h"
-#include "math.h"
 #include <misc.h>
 #include <sekwencje.h>
 #include <stdbool.h>
@@ -18,10 +15,8 @@
 #include <stm32f4xx_tim.h>
 #include <stm32f4xx_usart.h>
 #include <string.h>
-#include <time.h>
 #include "ws2812.h"
-
-
+#include "cmsis_lib/include/funkcje.h"
 
 #define false 0
 #define true 1
@@ -38,7 +33,7 @@ bool x1;
 int y;
 bool y2;
 
-int temp;
+int temp=0;
 
 int red_br,red_br2;
 int green_br,green_br2;
@@ -54,88 +49,17 @@ volatile int zmienna_usart3,zmienna_usart32;
 volatile int zmienna_usart4,zmienna_usart42;
 volatile int zmienna_usart5,zmienna_usart52;
 volatile int zmienna_usart6,zmienna_usart62;
-volatile int turn_led,turn_led2;
 
-void rcc();
-void gpio();
-void usart();
 void setBrightness(uint8_t x);
 uint8_t getBrightness(void);
 
-void reset()
+void TIM2_IRQHandler()
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-}
+	if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
+		pokazZmiane();
 
-void rcc()
-{
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-}
-
-void gpio()
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	// konfiguracja linii Tx
-	GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_USART3);
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOC, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14|GPIO_Pin_15|GPIO_Pin_13|GPIO_Pin_12;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-	// konfiguracja linii Rx
-	GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_USART3);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-	GPIO_Init(GPIOC, &GPIO_InitStructure);
-}
-
-void usart()
-{
-	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_BaudRate = 9600;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_HardwareFlowControl =
-	USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
-	// konfiguracja
-	USART_Init(USART3, &USART_InitStructure);
-
-	// wlaczenie ukladu USART
-	USART_Cmd(USART3, ENABLE );
-
-	NVIC_InitTypeDef NVIC_InitStructure;
-	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE );
-	NVIC_InitStructure. NVIC_IRQChannel = USART3_IRQn ;
-	NVIC_InitStructure. NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStructure. NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure. NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-	NVIC_EnableIRQ( USART3_IRQn );
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
 }
 
 void setBrightness(uint8_t x)
@@ -202,11 +126,9 @@ void USART3_IRQHandler(void)
 			{
 				temp=1;
 			}
-	//FUNKCJE WSZYSTKIE OD KOLORÓW itp. RING1
 
 	//ODBIERANIE JASNOŒCI
 			uint8_t c = USART3->DR;
-			//>>>>>>>>>>>>>>>>>>>>>>>
 			if(USART3->DR=='L')
 			{
 				x=0;
@@ -344,44 +266,26 @@ void USART3_IRQHandler(void)
 			// SEKWENCJE - RING_1
 			if(USART3->DR == 'a')
 			{
-				red_p=0;
-				green_p=0;
-				blue_p=0;
 				zmienna_usart1=1;
 			}
 			if(USART3->DR == 'b')
 			{
-				red_p=0;
-				green_p=0;
-				blue_p=0;
 				zmienna_usart2=1;
 			}
 			if(USART3->DR == 'c')
 			{
-				red_p=0;
-				green_p=0;
-				blue_p=0;
 				zmienna_usart3=1;
 			}
 			if(USART3->DR == 'd')
 			{
-				red_p=0;
-				green_p=0;
-				blue_p=0;
 				zmienna_usart4=1;
 			}
 			if(USART3->DR == 'e')
 			{
-				red_p=0;
-				green_p=0;
-				blue_p=0;
 				zmienna_usart5=1;
 			}
 			if(USART3->DR == 'f')
 			{
-				red_p=0;
-				green_p=0;
-				blue_p=0;
 				zmienna_usart6=1;
 			}
 
@@ -412,8 +316,15 @@ void USART3_IRQHandler(void)
 			// TURN OFF
 			if(USART3->DR == 'O')
 			{
-				turn_led=1;
-				clear_app(0,8);
+				Ringi[0].sekw =0;
+				Ringi[0].czas=0;
+				Ringi[0].index = 0;
+				zmienna_usart1=0;
+				zmienna_usart2=0;
+				zmienna_usart3=0;
+				zmienna_usart4=0;
+				zmienna_usart5=0;
+				zmienna_usart6=0;
 				red_br=0;
 				green_br=0;
 				blue_br=0;
@@ -424,7 +335,6 @@ void USART3_IRQHandler(void)
 		}
 
 	////////////////////RING2/////////////////////////
-
 		if(USART3->DR=='y'||temp==1)
 		{
 			//RING2
@@ -435,10 +345,9 @@ void USART3_IRQHandler(void)
 				temp=0;
 			}
 
-	//FUNKCJE WSZYSTKIE OD KOLORÓW itp. / RING2
 	//ODBIERANIE JASNOŒCI
 			uint8_t c1 = USART3->DR;
-			//>>>>>>>>>>>>>>>>>>>>>>>
+
 			if(USART3->DR=='L')
 			{
 				y=0;
@@ -465,7 +374,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c1==0)
 				red_p2=0;
-				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=71&&c1!=66&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109)
+				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=71&&c1!=66&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109&&c1!=283)
 				{
 					red_p2 = c1*4-1;
 					red_br2=red_p2;
@@ -484,7 +393,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c1<1)
 				green_p2=0;
-				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=82&&c1!=66&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109)
+				if (c1 >= 1 && c1 <= 255&&c1!=76&&c1!=82&&c1!=66&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109&&c1!=283)
 				{
 					green_p2 = c1*4-1;
 					green_br2=green_p2;
@@ -503,7 +412,7 @@ void USART3_IRQHandler(void)
 			{
 				if(c1<1)
 				blue_p2=0;
-				if (c1 >= 1 && c1 <= 255 && c1!=76 && c1!=82 && c1!=71&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109)
+				if (c1 >= 1 && c1 <= 255 && c1!=76 && c1!=82 && c1!=71&&c1!=120&&c1!=121&&c1!=97&&c1!=98&&c1!=99&&c1!=100&&c1!=101&&c1!=102&&c1!=103&&c1!=104&&c1!=105&&c1!=106&&c1!=107&&c1!=108&&c1!=109&&c1!=283)
 				{
 					blue_p2 = c1*4-1;
 					blue_br2=blue_p2;
@@ -513,7 +422,6 @@ void USART3_IRQHandler(void)
 			}
 			// RGB - RING_2
 			rgb2(red_p2, green_p2,blue_p2);
-
 
 			// KOLORY - RING_2
 			if(USART3->DR == 'g')
@@ -576,44 +484,26 @@ void USART3_IRQHandler(void)
 			// SEKWENCJE - RING_2
 			if(USART3->DR == 'a')
 			{
-				red_p2=0;
-				green_p2=0;
-				blue_p2=0;
 				zmienna_usart12=1;
 			}
 			if(USART3->DR == 'b')
 			{
-				red_p2=0;
-				green_p2=0;
-				blue_p2=0;
 				zmienna_usart22=1;
 			}
 			if(USART3->DR == 'c')
 			{
-				red_p2=0;
-				green_p2=0;
-				blue_p2=0;
 				zmienna_usart32=1;
 			}
 			if(USART3->DR == 'd')
 			{
-				red_p2=0;
-				green_p2=0;
-				blue_p2=0;
 				zmienna_usart42=1;
 			}
 			if(USART3->DR == 'e')
 			{
-				red_p2=0;
-				green_p2=0;
-				blue_p2=0;
 				zmienna_usart52=1;
 			}
 			if(USART3->DR == 'f')
 			{
-				red_p2=0;
-				green_p2=0;
-				blue_p2=0;
 				zmienna_usart62=1;
 			}
 			if(brightness2)
@@ -642,7 +532,15 @@ void USART3_IRQHandler(void)
 			// TURN OFF
 			if(USART3->DR == 'O')
 			{
-				turn_led2=1;
+				Ringi[1].sekw =0;
+				Ringi[1].czas=0;
+				Ringi[1].index = 0;
+				zmienna_usart12=0;
+				zmienna_usart22=0;
+				zmienna_usart32=0;
+				zmienna_usart42=0;
+				zmienna_usart52=0;
+				zmienna_usart62=0;
 				red_br2=0;
 				green_br2=0;
 				blue_br2=0;
@@ -660,134 +558,65 @@ int main(void)
 	rcc();
 	gpio();
 	usart();
-	init_systick();	//delay
 	ws2812_init();	//LED
+
+	UstawTimer(Tim2,8399, 49, ENABLE);
+	UstawPrzerwanie(TIM2_IRQn, 0);
+	UstawPrzerwanieTimera(TIM2, TIM_IT_Update);
+	ustawSekwencje();
 
 	while(1)
 	{
 		if(zmienna_usart1==1)
 		{
-			seq11(0,8);
-			if(turn_led==1)
-			{
-				zmienna_usart1=0;
-				clear_app(0,8);
-				turn_led=0;
-			}
+			Ringi[0].sekw = &Sekwencje.sekw[0];
 		}
-
 
 		if(zmienna_usart2==1)
 		{
-			seq2(0,8);
-			if(turn_led==1)
-			{
-				clear_app(0,8);
-				turn_led=0;
-				zmienna_usart2=0;
-			}
+			Ringi[0].sekw = &Sekwencje.sekw[1];
 		}
 		if(zmienna_usart3==1)
 		{
-			seq3(0,8);
-			if(turn_led==1)
-			{
-				clear_app(0,8);
-				turn_led=0;
-				zmienna_usart3=0;
-			}
+			Ringi[0].sekw = &Sekwencje.sekw[2];
 		}
 		if(zmienna_usart4==1)
 		{
-			seq10(0,8);
-			if(turn_led==1)
-			{
-				clear_app(0,8);
-				turn_led=0;
-				zmienna_usart4=0;
-			}
+			Ringi[0].sekw = &Sekwencje.sekw[3];
 		}
 		if(zmienna_usart5==1)
 		{
-			seq7(0,8);
-			if(turn_led==1)
-			{
-				clear_app(0,8);
-				turn_led=0;
-				zmienna_usart5=0;
-			}
+			Ringi[0].sekw = &Sekwencje.sekw[5];
 		}
 		if(zmienna_usart6==1)
 		{
-			seq6(0,8);
-			if(turn_led==1)
-			{
-				clear_app(0,8);
-				turn_led=0;
-				zmienna_usart6=0;
-			}
+			Ringi[0].sekw = &Sekwencje.sekw[4];
 		}
 
 		//////////////////RING2///////////////////////////
 		if(zmienna_usart12==1)
 		{
-			seq112(8,16);
-			if(turn_led2==1)
-			{
-				clear_app(8,16);
-				turn_led2=0;
-				zmienna_usart12=0;
-			}
+			Ringi[1].sekw = &Sekwencje.sekw[0];
 		}
 		if(zmienna_usart22==1)
 		{
-			seq2(8,16);
-			if(turn_led2==1)
-			{
-				clear_app(8,16);
-				turn_led2=0;
-				zmienna_usart22=0;
-			}
+			Ringi[1].sekw = &Sekwencje.sekw[1];
 		}
 		if(zmienna_usart32==1)
 		{
-			seq3(8,16);
-			if(turn_led2==1)
-			{
-				clear_app(8,16);
-				turn_led2=0;
-				zmienna_usart32=0;
-			}
+			Ringi[1].sekw = &Sekwencje.sekw[2];
 		}
 		if(zmienna_usart42==1)
 		{
-			seq9(8,16);
-			if(turn_led2==1)
-			{
-				clear_app(8,16);
-				turn_led2=0;
-				zmienna_usart42=0;
-			}
+			Ringi[1].sekw = &Sekwencje.sekw[3];
 		}
 		if(zmienna_usart52==1)
 		{
-			seq8(8,16);
-			if(turn_led2==1)
-			{
-				clear_app(8,16);
-				turn_led2=0;
-				zmienna_usart52=0;
-			}
+			Ringi[1].sekw = &Sekwencje.sekw[5];
 		}
 		if(zmienna_usart62==1)
 		{
-			seq6(8,16);
-			if(turn_led2==1)
-			{
-				clear_app(8,16);
-				turn_led2=0;
-				zmienna_usart62=0;
-			}
+			Ringi[1].sekw = &Sekwencje.sekw[4];
 		}
 	}
 }
