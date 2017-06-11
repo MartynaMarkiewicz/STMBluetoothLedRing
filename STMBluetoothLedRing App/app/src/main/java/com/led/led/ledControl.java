@@ -1,19 +1,14 @@
 package com.led.led;
 
 import android.graphics.Color;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Size;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.webkit.WebSettings;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -26,9 +21,6 @@ import android.os.AsyncTask;
 import java.io.IOException;
 import java.lang.String;
 import java.util.UUID;
-import java.lang.Object;
-import java.io.InputStream;
-
 
 public class ledControl extends ActionBarActivity {
 
@@ -43,8 +35,8 @@ public class ledControl extends ActionBarActivity {
     private boolean isBtConnected = false;
     Integer pr_redR1=0,pr_redR2=0, pr_greenR1=0,pr_greenR2=0,pr_blueR1=0,pr_blueR2=0,pr_brightnessR1=10,pr_brightnessR2=10;
     Integer temp_ring=0;
-    Integer temp_S1R1=0,temp_S2R1=0,temp_S3R1=0,temp_S4R1=0,temp_S5R1=0,temp_S6R1=0;  //pomocnicze przy zmianie ringa ring1
-    Integer temp_S1R2=0,temp_S2R2=0,temp_S3R2=0,temp_S4R2=0,temp_S5R2=0,temp_S6R2=0;  //ring2
+    Integer temp_S1R1=0,temp_S2R1=0,temp_S3R1=0,temp_S4R1=0,temp_S5R1=0,temp_S6R1=0;
+    Integer temp_S1R2=0,temp_S2R2=0,temp_S3R2=0,temp_S4R2=0,temp_S5R2=0,temp_S6R2=0;
 
 
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -124,11 +116,6 @@ public class ledControl extends ActionBarActivity {
                     {
                         if(temp_ring==0) //ring1
                         {
-                            if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
-                            {
-                                Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
-                            }
-                            else
                             {
                                 Socket.getOutputStream().write('R');
                                 Socket.getOutputStream().write(Integer.valueOf(0));
@@ -139,6 +126,7 @@ public class ledControl extends ActionBarActivity {
                                 red.setProgress(0);
                                 green.setProgress(0);
                                 blue.setProgress(0);
+                                brightness.setProgress(10);
                                 Integer pr = 0;
                                 lumnred.setText(String.valueOf(progress));
                                 r.setText(String.valueOf(pr));
@@ -146,14 +134,11 @@ public class ledControl extends ActionBarActivity {
                                 g.setText(String.valueOf(pr));
                                 lumnblue.setText(String.valueOf(progress));
                                 b.setText(String.valueOf(pr));
+                                l.setText(String.valueOf(100+"%"));
                                 pr_redR1 = 0;
-                                pr_redR2 = 0;
                                 pr_greenR1 = 0;
-                                pr_greenR2 = 0;
                                 pr_blueR1 = 0;
-                                pr_blueR2 = 0;
                                 pr_brightnessR1 = 10;
-                                pr_brightnessR2 = 10;
                                 temp_S1R1 = 1;
                                 temp_S2R1 = 0;
                                 temp_S3R1 = 0;
@@ -167,11 +152,6 @@ public class ledControl extends ActionBarActivity {
                         }
                         if(temp_ring==1) //ring2
                         {
-                            if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
-                            {
-                                Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
-                            }
-                            else
                             {
                                 Socket.getOutputStream().write('R');
                                 Socket.getOutputStream().write(Integer.valueOf(0));
@@ -182,6 +162,7 @@ public class ledControl extends ActionBarActivity {
                                 red.setProgress(0);
                                 green.setProgress(0);
                                 blue.setProgress(0);
+                                brightness.setProgress(10);
                                 Integer pr = 0;
                                 lumnred.setText(String.valueOf(progress));
                                 r.setText(String.valueOf(pr));
@@ -189,13 +170,10 @@ public class ledControl extends ActionBarActivity {
                                 g.setText(String.valueOf(pr));
                                 lumnblue.setText(String.valueOf(progress));
                                 b.setText(String.valueOf(pr));
-                                pr_redR1 = 0;
+                                l.setText(String.valueOf(100+"%"));
                                 pr_redR2 = 0;
-                                pr_greenR1 = 0;
                                 pr_greenR2 = 0;
-                                pr_blueR1 = 0;
                                 pr_blueR2 = 0;
-                                pr_brightnessR1 = 10;
                                 pr_brightnessR2 = 10;
                                 temp_S1R2 = 1;
                                 temp_S2R2 = 0;
@@ -239,11 +217,6 @@ public class ledControl extends ActionBarActivity {
                         {
                             if(temp_ring==0) //ring1
                             {
-                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -254,6 +227,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -261,14 +235,11 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR1 = 0;
-                                    pr_redR2 = 0;
                                     pr_greenR1 = 0;
-                                    pr_greenR2 = 0;
                                     pr_blueR1 = 0;
-                                    pr_blueR2 = 0;
                                     pr_brightnessR1 = 10;
-                                    pr_brightnessR2 = 10;
                                     temp_S1R1 = 0;
                                     temp_S2R1 = 1;
                                     temp_S3R1 = 0;
@@ -282,11 +253,6 @@ public class ledControl extends ActionBarActivity {
                             }
                             if(temp_ring==1) //ring2
                             {
-                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -297,6 +263,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -304,13 +271,10 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
-                                    pr_redR1 = 0;
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR2 = 0;
-                                    pr_greenR1 = 0;
                                     pr_greenR2 = 0;
-                                    pr_blueR1 = 0;
                                     pr_blueR2 = 0;
-                                    pr_brightnessR1 = 10;
                                     pr_brightnessR2 = 10;
                                     temp_S1R2 = 0;
                                     temp_S2R2 = 1;
@@ -354,11 +318,6 @@ public class ledControl extends ActionBarActivity {
                         {
                             if(temp_ring==0) //ring1
                             {
-                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -369,6 +328,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -376,14 +336,11 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR1 = 0;
-                                    pr_redR2 = 0;
                                     pr_greenR1 = 0;
-                                    pr_greenR2 = 0;
                                     pr_blueR1 = 0;
-                                    pr_blueR2 = 0;
                                     pr_brightnessR1 = 10;
-                                    pr_brightnessR2 = 10;
                                     temp_S1R1 = 0;
                                     temp_S2R1 = 0;
                                     temp_S3R1 = 1;
@@ -397,11 +354,6 @@ public class ledControl extends ActionBarActivity {
                             }
                             if(temp_ring==1) //ring2
                             {
-                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -412,6 +364,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -419,13 +372,10 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
-                                    pr_redR1 = 0;
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR2 = 0;
-                                    pr_greenR1 = 0;
                                     pr_greenR2 = 0;
-                                    pr_blueR1 = 0;
                                     pr_blueR2 = 0;
-                                    pr_brightnessR1 = 10;
                                     pr_brightnessR2 = 10;
                                     temp_S1R2 = 0;
                                     temp_S2R2 = 0;
@@ -469,11 +419,6 @@ public class ledControl extends ActionBarActivity {
                         {
                             if(temp_ring==0) //ring1
                             {
-                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -484,6 +429,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -491,14 +437,11 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR1 = 0;
-                                    pr_redR2 = 0;
                                     pr_greenR1 = 0;
-                                    pr_greenR2 = 0;
                                     pr_blueR1 = 0;
-                                    pr_blueR2 = 0;
                                     pr_brightnessR1 = 10;
-                                    pr_brightnessR2 = 10;
                                     temp_S1R1 = 0;
                                     temp_S2R1 = 0;
                                     temp_S3R1 = 0;
@@ -512,11 +455,6 @@ public class ledControl extends ActionBarActivity {
                             }
                             if(temp_ring==1) //ring2
                             {
-                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -527,6 +465,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -534,13 +473,10 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
-                                    pr_redR1 = 0;
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR2 = 0;
-                                    pr_greenR1 = 0;
                                     pr_greenR2 = 0;
-                                    pr_blueR1 = 0;
                                     pr_blueR2 = 0;
-                                    pr_brightnessR1 = 10;
                                     pr_brightnessR2 = 10;
                                     temp_S1R2 = 0;
                                     temp_S2R2 = 0;
@@ -584,11 +520,6 @@ public class ledControl extends ActionBarActivity {
                         {
                             if(temp_ring==0) //ring1
                             {
-                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -599,6 +530,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -606,14 +538,11 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR1 = 0;
-                                    pr_redR2 = 0;
                                     pr_greenR1 = 0;
-                                    pr_greenR2 = 0;
                                     pr_blueR1 = 0;
-                                    pr_blueR2 = 0;
                                     pr_brightnessR1 = 10;
-                                    pr_brightnessR2 = 10;
                                     temp_S1R1 = 0;
                                     temp_S2R1 = 0;
                                     temp_S3R1 = 0;
@@ -627,11 +556,6 @@ public class ledControl extends ActionBarActivity {
                             }
                             if(temp_ring==1) //ring2
                             {
-                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -642,6 +566,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -649,13 +574,10 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
-                                    pr_redR1 = 0;
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR2 = 0;
-                                    pr_greenR1 = 0;
                                     pr_greenR2 = 0;
-                                    pr_blueR1 = 0;
                                     pr_blueR2 = 0;
-                                    pr_brightnessR1 = 10;
                                     pr_brightnessR2 = 10;
                                     temp_S1R2 = 0;
                                     temp_S2R2 = 0;
@@ -699,11 +621,6 @@ public class ledControl extends ActionBarActivity {
                         {
                             if(temp_ring==0) //ring1
                             {
-                                if(temp_S1R2==1||temp_S2R2==1||temp_S3R2==1||temp_S4R2==1||temp_S5R2==1||temp_S6R2==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 2", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -714,6 +631,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -721,14 +639,11 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR1 = 0;
-                                    pr_redR2 = 0;
                                     pr_greenR1 = 0;
-                                    pr_greenR2 = 0;
                                     pr_blueR1 = 0;
-                                    pr_blueR2 = 0;
                                     pr_brightnessR1 = 10;
-                                    pr_brightnessR2 = 10;
                                     temp_S1R1 = 0;
                                     temp_S2R1 = 0;
                                     temp_S3R1 = 0;
@@ -742,11 +657,6 @@ public class ledControl extends ActionBarActivity {
                             }
                             if(temp_ring==1) //ring2
                             {
-                                if(temp_S1R1==1||temp_S2R1==1||temp_S3R1==1||temp_S4R1==1||temp_S5R1==1||temp_S6R1==1)
-                                {
-                                    Toast.makeText(getApplicationContext(),"TURN OFF THE SEQUENCE ON THE RING 1", Toast.LENGTH_SHORT).show();
-                                }
-                                else
                                 {
                                     Socket.getOutputStream().write('R');
                                     Socket.getOutputStream().write(Integer.valueOf(0));
@@ -757,6 +667,7 @@ public class ledControl extends ActionBarActivity {
                                     red.setProgress(0);
                                     green.setProgress(0);
                                     blue.setProgress(0);
+                                    brightness.setProgress(10);
                                     Integer pr = 0;
                                     lumnred.setText(String.valueOf(progress));
                                     r.setText(String.valueOf(pr));
@@ -764,13 +675,10 @@ public class ledControl extends ActionBarActivity {
                                     g.setText(String.valueOf(pr));
                                     lumnblue.setText(String.valueOf(progress));
                                     b.setText(String.valueOf(pr));
-                                    pr_redR1 = 0;
+                                    l.setText(String.valueOf(100+"%"));
                                     pr_redR2 = 0;
-                                    pr_greenR1 = 0;
                                     pr_greenR2 = 0;
-                                    pr_blueR1 = 0;
                                     pr_blueR2 = 0;
-                                    pr_brightnessR1 = 10;
                                     pr_brightnessR2 = 10;
                                     temp_S1R2 = 0;
                                     temp_S2R2 = 0;
@@ -1013,6 +921,42 @@ public class ledControl extends ActionBarActivity {
                     {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 34;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 34;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 8;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 8;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 0;
+                            }
+                            red.setProgress(34);
+                            green.setProgress(8);
+                            blue.setProgress(0);
+                            Integer red = 135;
+                            Integer green = 31;
+                            Integer blue = 0;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('g');
                         }
                         catch (IOException e)
@@ -1038,6 +982,42 @@ public class ledControl extends ActionBarActivity {
                         {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 49;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 49;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 3;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 3;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 0;
+                            }
+                            red.setProgress(49);
+                            green.setProgress(3);
+                            blue.setProgress(0);
+                            Integer red = 195;
+                            Integer green = 111;
+                            Integer blue = 0;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('h');
                         }
                         catch (IOException e)
@@ -1063,6 +1043,42 @@ public class ledControl extends ActionBarActivity {
                     {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 6;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 6;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 25;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 25;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 0;
+                            }
+                            red.setProgress(6);
+                            green.setProgress(25);
+                            blue.setProgress(0);
+                            Integer red = 24;
+                            Integer green = 100;
+                            Integer blue = 0;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('i');
                         }
                         catch (IOException e)
@@ -1088,6 +1104,42 @@ public class ledControl extends ActionBarActivity {
                         {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 0;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 61;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 61;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 19;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 19;
+                            }
+                            red.setProgress(0);
+                            green.setProgress(61);
+                            blue.setProgress(19);
+                            Integer red = 0;
+                            Integer green = 243;
+                            Integer blue = 75;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('j');
                         }
                         catch (IOException e)
@@ -1113,6 +1165,42 @@ public class ledControl extends ActionBarActivity {
                         {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 64;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 64;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 0;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 13;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 13;
+                            }
+                            red.setProgress(64);
+                            green.setProgress(0);
+                            blue.setProgress(13);
+                            Integer red = 255;
+                            Integer green = 0;
+                            Integer blue = 51;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('k');
                         }
                         catch (IOException e)
@@ -1138,6 +1226,42 @@ public class ledControl extends ActionBarActivity {
                         {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 64;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 64;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 0;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 64;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 64;
+                            }
+                            red.setProgress(64);
+                            green.setProgress(0);
+                            blue.setProgress(64);
+                            Integer red = 255;
+                            Integer green = 0;
+                            Integer blue = 255;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('l');
                         }
                         catch (IOException e)
@@ -1163,6 +1287,42 @@ public class ledControl extends ActionBarActivity {
                         {
                         try
                         {
+                            if (temp_ring == 0)
+                            {
+                                pr_redR1 = 5;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_redR2 = 5;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_greenR1 = 0;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_greenR2 = 0;
+                            }
+                            if (temp_ring == 0)
+                            {
+                                pr_blueR1 = 52;
+                            }
+                            if (temp_ring == 1)
+                            {
+                                pr_blueR2 = 52;
+                            }
+                            red.setProgress(5);
+                            green.setProgress(0);
+                            blue.setProgress(52);
+                            Integer red = 19;
+                            Integer green = 0;
+                            Integer blue = 207;
+                            lumnred.setText(String.valueOf(progress));
+                            r.setText(String.valueOf(red));
+                            lumngreen.setText(String.valueOf(progress));
+                            g.setText(String.valueOf(green));
+                            lumnblue.setText(String.valueOf(progress));
+                            b.setText(String.valueOf(blue));
                             Socket.getOutputStream().write('m');
                         }
                         catch (IOException e)
@@ -1435,7 +1595,7 @@ public class ledControl extends ActionBarActivity {
         }
     }
 
-    public void changevar()  //WYRESETOWANIE WSZYSTKICH WARTOSCI- USATWIENIE SEEKBARÓW NA wart. pocz.
+    public void changevar()
     {
                     Integer pr=0;
                     lumnred.setText(String.valueOf(progress));
