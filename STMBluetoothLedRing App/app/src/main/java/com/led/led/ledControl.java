@@ -1549,7 +1549,7 @@ public class ledControl extends ActionBarActivity {
                     green.setProgress(0);
                     blue.setProgress(0);
                     brightness.setProgress(10);
-                    l.setText(String.valueOf(100+ "%"));
+                    l.setText(String.valueOf(100 + "%"));
                     changevar();
                     Socket.getOutputStream().write('O');
                     if(temp_ring==0)
