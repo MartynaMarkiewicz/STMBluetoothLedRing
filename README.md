@@ -11,9 +11,9 @@ The power supply (+5V, GND) of the first and the second ring is directly connect
 The power supply (+5V, GND) coming out of the STM board is connected to the +5V external power supply.
 
 Projects components:<br />
-	</md-tab>-STM32F4xxx DISCOVERY <br />
-	</md-tab>-Bluetooth module HC-06 <br />
-	</md-tab>-2x LED RING RGB WS2812B 5050 x 8 diode - 32mm <br />
+-STM32F4xxx DISCOVERY <br />
+-Bluetooth module HC-06 <br />
+-2x LED RING RGB WS2812B 5050 x 8 diode - 32mm <br />
 
 ### Tools: 
 CooCox CoIDE 1.7.8 - language C  
@@ -21,13 +21,12 @@ Android Studio 2.3 - language JAVA
 
 ### How to run:
 Connections:<br />
-	-Bluetooth module HC-06:<br />
-        	RxD-->PC10, <br />
-		TxD-->PC11, <br />
-        	GND-->GND,      
-        	VCC-->5V<br /><br />
-	-LED RING RGB WS2812B:<br /> 
-        	DI-->PC9<br />
+| Bluetooth module HC-06:        | LED RING RGB WS2812B           |
+| ------------- |:-------------:| 
+| RxD-->PC10      | DI-->PC9 |
+| TxD-->PC11      |      |
+| GND-->GND |      |
+| VCC-->5V |     |
 	
 Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)
   1 – ring selection<br />
