@@ -30,7 +30,7 @@ LED RING RGB WS2812B:<br />
 DI-->PC9<br />
 
 Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)<br />
-![alt tag](http://i.imgur.com/tphCswE.png)  <br />
+![alt tag](http://i.imgur.com/Da1mIS2.png)  <br />
   1 – ring selection<br />
   2 – colour brightness control<br />
   3 – red colour settings<br />
