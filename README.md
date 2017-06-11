@@ -21,13 +21,14 @@ Android Studio 2.3 - language JAVA
 
 ### How to run:
 Connections:<br />
-| Bluetooth module HC-06:        | LED RING RGB WS2812B           |
-| ------------- |:-------------:| 
-| RxD-->PC10      | DI-->PC9 |
-| TxD-->PC11      |      |
-| GND-->GND |      |
-| VCC-->5V |     |
-	
+Bluetooth module HC-06:<br />
+RxD-->PC10<br />
+TxD-->PC11<br />
+GND-->GND<br />
+VCC-->5V<br /><br />
+LED RING RGB WS2812B:<br />
+DI-->PC9<br />
+
 Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)
   1 – ring selection<br />
   2 – colour brightness control<br />
