@@ -20,7 +20,7 @@ CooCox CoIDE 1.7.8 - language C
 Android Studio 2.3 - language JAVA
 
 ### How to run:
-# Connections:<br />
+#### Connections:<br />
 Bluetooth module HC-06:<br />
 RxD-->PC10<br />
 TxD-->PC11<br />
@@ -29,7 +29,7 @@ VCC-->5V<br /><br />
 LED RING RGB WS2812B:<br />
 DI-->PC9<br />
 
-Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)
+Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)<br />
 ![alt tag](http://i.imgur.com/a/I79CC.png)  
   1 – ring selection<br />
   2 – colour brightness control<br />
