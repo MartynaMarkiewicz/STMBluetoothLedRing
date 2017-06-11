@@ -1548,6 +1548,8 @@ public class ledControl extends ActionBarActivity {
                     red.setProgress(0);
                     green.setProgress(0);
                     blue.setProgress(0);
+                    brightness.setProgress(10);
+                    l.setText(String.valueOf(100+ "%"));
                     changevar();
                     Socket.getOutputStream().write('O');
                     if(temp_ring==0)
@@ -1555,6 +1557,7 @@ public class ledControl extends ActionBarActivity {
                         pr_redR1=0;
                         pr_greenR1=0;
                         pr_blueR1=0;
+                        pr_brightnessR1=10;
                         temp_S1R1=0;
                         temp_S2R1=0;
                         temp_S3R1=0;
@@ -1567,6 +1570,7 @@ public class ledControl extends ActionBarActivity {
                         pr_redR2=0;
                         pr_greenR2=0;
                         pr_blueR2=0;
+                        pr_brightnessR2=10;
                         temp_S1R2=0;
                         temp_S2R2=0;
                         temp_S3R2=0;
