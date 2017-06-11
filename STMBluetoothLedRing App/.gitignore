@@ -8,9 +8,9 @@
 /captures
 /.idea/gradle.xml.idea# Built application files
 /*/build/
-*.bat
-*.properties
-bat
+/*.bat
+/*.properties
+
 
 # built application files
 *.apk
