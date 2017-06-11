@@ -11,6 +11,9 @@
 *.bat
 *.properties
 *.gradle
+*.pro
+/gradlew
+gradlew
 
 
 # built application files
