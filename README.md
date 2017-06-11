@@ -24,13 +24,12 @@ Connections:<br />
 	-Bluetooth module HC-06:<br />
         	RxD-->PC10, <br />
 		TxD-->PC11, <br />
-        	GND-->GND, <br />      
-        	VCC-->5V <br />
+        	GND-->GND,<br />      
+        	VCC-->5V<br />
 	-LED RING RGB WS2812B:<br /> 
         	DI-->PC9<br />
 	
 Turn on the Bluetooth on a mobile phone and pair devices (mobile phone with the HC-06 module)
-![alt tag](http://i.imgur.com/9qvkqrC.png) <br />
   1 – ring selection<br />
   2 – colour brightness control<br />
   3 – red colour settings<br />
