@@ -1,682 +1,1790 @@
 #include "stm32f4xx_conf.h"
 #include <stm32f4xx.h>
-#include <stm32f4xx_rcc.h>
-#include <stm32f4xx_gpio.h>
-#include <stm32f4xx_tim.h>
-#include <stm32f4xx_dma.h>
-#include <stm32f4xx_usart.h>
-#include "stm32f4xx_exti.h"
-#include <misc.h>
-#include "delay.h"
 #include "ws2812.h"
-#include "stm32f4xx_usart.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <ctype.h>
 
-//sekwencje a-f
-void seq1(int k, int j)
+struct zmiana
 {
-	int i=0;
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=200;
-		delay_ms(250);
-		diode[i].red = diode[i].green = diode[i].blue = 255;
-		delay_ms(500);
-	}
-	clear();
-}
+	char r;
+	char g;
+	char b;
+	char dioda;
+	int czas;
+};
 
-void seq2(int k, int j)
+struct sekwencja
 {
+	struct zmiana zmiany[1000];
+	int ilosc;
+};
 
-	int i=0;
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=195;
-		diode[i].green=111;
-		diode[i].blue=0;
-		delay_ms(100);
-	}
-
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=100;
-		delay_ms(100);
-	}
-
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=255;
-		diode[i].green=0;
-		diode[i].blue=51;
-		delay_ms(100);
-	}
-
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=19;
-		diode[i].green=0;
-		diode[i].blue=207;
-		delay_ms(100);
-	}
-
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=0;
-		diode[i].green=243;
-		diode[i].blue=75;
-		delay_ms(100);
-	}
-
-}
-
-void seq3(int k, int j)
+struct ring
 {
-	int i=0;
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=0;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=20;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=50;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=70;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=100;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=120;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=150;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=170;
-		delay_ms(100);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=200;
-		delay_ms(100);
-	}
-}
+	struct sekwencja* sekw;
+	int czas;
+	int index;
+	int dioda_od;
+};
 
-void seq4(int k, int j) //tak sobie
+struct sekwencje
 {
-	int i=0;
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=255;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=200;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=155;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=100;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=55;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=15;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=5;
-		delay_ms(250);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=255;
-	}
-	for(i=k;i<j;i++)
-	{
-		delay_ms(250);
-		diode[i].green=diode[i].blue=diode[i].red=255;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=200;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=155;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=100;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=55;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=15;
-		delay_ms(50);
-		diode[i].green=diode[i].blue=diode[i].red=5;
-		delay_ms(250);
-	}
-	clear();
-}
+	struct sekwencja sekw[6];
+};
+struct sekwencje Sekwencje;
+struct ring Ringi[2];
 
-void seq5(int k, int j) //polaczyc z czyms
+//zapis wszystkich danych
+void ustawSekwencje()
 {
-	int i=0;
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=10;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=50;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=100;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=150;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=200;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=250;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=250;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=200;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=100;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=50;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=10;
-		delay_ms(50);
-	}
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=diode[i].blue=diode[i].red=0;
-		delay_ms(50);
-	}
-	clear();
-}
+	Ringi[0].dioda_od = 0;
+	Ringi[1].dioda_od = 8;
 
-void seq6(int k, int j)
-{
-	int i=0;
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=255;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=150;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=50;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].red=10;
-	}
-		delay_ms(550);
-	clear_all();
-	//////////////////////////BLUE//////////////////////////
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=255;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=150;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=50;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].blue=10;
-	}
-		delay_ms(550);
-	clear_all();
-	//////////////////////////GREEN//////////////////////////
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=255;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=150;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=50;
-	}
-		delay_ms(550);
-	for(i=k;i<j;i++)
-	{
-		diode[i].green=10;
-	}
-		delay_ms(550);
-	clear_all();
-}
+	//SEKWENCJA 1
+	int l;
+	l=0;
+	//1 zmiana
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//druga
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//trzecia
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//czwarta
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//piata
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//szosta
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda =1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//siodma
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	//osma
+	Sekwencje.sekw[0].zmiany[l].r = 51;
+	Sekwencje.sekw[0].zmiany[l].g = 15;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 0;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 167;
+	Sekwencje.sekw[0].zmiany[l].g = 31;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 1;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 255;
+	Sekwencje.sekw[0].zmiany[l].g = 39;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 2;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 3;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 4;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 5;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 0;
+	Sekwencje.sekw[0].zmiany[l].g = 0;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 6;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].r = 11;
+	Sekwencje.sekw[0].zmiany[l].g = 3;
+	Sekwencje.sekw[0].zmiany[l].b = 0;
+	Sekwencje.sekw[0].zmiany[l].czas = 0;
+	Sekwencje.sekw[0].zmiany[l].dioda = 7;
+	l++;
+	Sekwencje.sekw[0].zmiany[l].czas = 30;
+	l++;
+	Sekwencje.sekw[0].ilosc = l;
 
-void seq7()
-{
-	diode[0].red=255; 	diode[0].green=255; 	diode[0].blue=225;
-	diode[1].red=255; 	diode[1].green=0;	  	diode[1].blue=225;
-	diode[2].red=255; 	diode[2].green=0;   	diode[2].blue=0;
-	diode[3].red=255; 	diode[3].green=69;  	diode[3].blue=0;
-	diode[4].red=255; 	diode[4].green=255; 	diode[4].blue=0;
-	diode[5].red=0;   	diode[5].green=255; 	diode[5].blue=0;
-	diode[6].red=0;   	diode[6].green=0;   	diode[6].blue=225;
-	diode[7].red=0;   	diode[7].green=243; 	diode[7].blue=75;
-	delay_ms(250);
-	////////////////////
-	diode[0].red=0;   	diode[0].green=243; 	diode[0].blue=75;
-	diode[1].red=255; 	diode[1].green=255; 	diode[1].blue=225;
-	diode[2].red=255; 	diode[2].green=0;	  	diode[2].blue=225;
-	diode[3].red=255; 	diode[3].green=0;   	diode[3].blue=0;
-	diode[4].red=255; 	diode[4].green=69;  	diode[4].blue=0;
-	diode[5].red=255; 	diode[5].green=255; 	diode[5].blue=0;
-	diode[6].red=0;   	diode[6].green=255; 	diode[6].blue=0;
-	diode[7].red=0;   	diode[7].green=0;   	diode[7].blue=225;
-	delay_ms(250);
-	///////////////
-	diode[0].red=0;   	diode[0].green=0;   	diode[0].blue=225;
-	diode[1].red=0;   	diode[1].green=243; 	diode[1].blue=75;
-	diode[2].red=255; 	diode[2].green=255; 	diode[2].blue=225;
-	diode[3].red=255; 	diode[3].green=0;	  	diode[3].blue=225;
-	diode[4].red=255; 	diode[4].green=0;   	diode[4].blue=0;
-	diode[5].red=255; 	diode[5].green=69;  	diode[5].blue=0;
-	diode[6].red=255; 	diode[6].green=255; 	diode[6].blue=0;
-	diode[7].red=0;   	diode[7].green=255; 	diode[7].blue=0;
-	delay_ms(250);
-	///////////////
-	diode[0].red=0;   	diode[0].green=255; 	diode[0].blue=0;
-	diode[1].red=0;   	diode[1].green=0;   	diode[1].blue=225;
-	diode[2].red=0;   	diode[2].green=243; 	diode[2].blue=75;
-	diode[3].red=255; 	diode[3].green=255; 	diode[3].blue=225;
-	diode[4].red=255; 	diode[4].green=0;	  	diode[4].blue=225;
-	diode[5].red=255; 	diode[5].green=0;   	diode[5].blue=0;
-	diode[6].red=255; 	diode[6].green=69;  	diode[6].blue=0;
-	diode[7].red=255; 	diode[7].green=255; 	diode[7].blue=0;
-	delay_ms(250);
-	///////////////
-	diode[0].red=255; 	diode[0].green=255; 	diode[0].blue=0;
-	diode[1].red=0;   	diode[1].green=255; 	diode[1].blue=0;
-	diode[2].red=0;   	diode[2].green=0;   	diode[2].blue=225;
-	diode[3].red=0;   	diode[3].green=243; 	diode[3].blue=75;
-	diode[4].red=255; 	diode[4].green=255; 	diode[4].blue=225;
-	diode[5].red=255; 	diode[5].green=0;	  	diode[5].blue=225;
-	diode[6].red=255; 	diode[6].green=0;   	diode[6].blue=0;
-	diode[7].red=255; 	diode[7].green=69;  	diode[7].blue=0;
-	delay_ms(250);
-	///////////////
-	diode[0].red=255; 	diode[0].green=69;  	diode[0].blue=0;
-	diode[1].red=255; 	diode[1].green=255; 	diode[1].blue=0;
-	diode[2].red=0;   	diode[2].green=255; 	diode[2].blue=0;
-	diode[3].red=0;   	diode[3].green=0;   	diode[3].blue=225;
-	diode[4].red=0;   	diode[4].green=243; 	diode[4].blue=75;
-	diode[5].red=255; 	diode[5].green=255; 	diode[5].blue=225;
-	diode[6].red=255; 	diode[6].green=0;	  	diode[6].blue=225;
-	diode[7].red=255; 	diode[7].green=0;   	diode[7].blue=0;
-	delay_ms(250);
-	///////////////
-	diode[0].red=255; 	diode[0].green=0;   	diode[0].blue=0;
-	diode[1].red=255; 	diode[1].green=69;  	diode[1].blue=0;
-	diode[2].red=255; 	diode[2].green=255; 	diode[2].blue=0;
-	diode[3].red=0;   	diode[3].green=255; 	diode[3].blue=0;
-	diode[4].red=0;   	diode[4].green=0;   	diode[4].blue=225;
-	diode[5].red=0;   	diode[5].green=243; 	diode[5].blue=75;
-	diode[6].red=255; 	diode[6].green=255; 	diode[6].blue=225;
-	diode[7].red=255; 	diode[7].green=0;	  	diode[7].blue=225;
-	delay_ms(250);
-	///////////////
-	diode[0].red=255; 	diode[0].green=0;	  	diode[0].blue=225;
-	diode[1].red=255; 	diode[1].green=0;   	diode[1].blue=0;
-	diode[2].red=255; 	diode[2].green=69;  	diode[2].blue=0;
-	diode[3].red=255; 	diode[3].green=255; 	diode[3].blue=0;
-	diode[4].red=0;   	diode[4].green=255; 	diode[4].blue=0;
-	diode[5].red=0;   	diode[5].green=0;   	diode[5].blue=225;
-	diode[6].red=0;   	diode[6].green=243; 	diode[6].blue=75;
-	diode[7].red=255; 	diode[7].green=255; 	diode[7].blue=225;
-	delay_ms(250);
-}
-
-void seq8(int k, int j)
-{
-	diode[8].red=255; 	diode[8].green=255; 	diode[8].blue=225;
-	diode[9].red=255; 	diode[9].green=0;	  	diode[9].blue=225;
-	diode[10].red=255; 	diode[10].green=0;   	diode[10].blue=0;
-	diode[11].red=255; 	diode[11].green=69;  	diode[11].blue=0;
-	diode[12].red=255; 	diode[12].green=255; 	diode[12].blue=0;
-	diode[13].red=0;   	diode[13].green=255; 	diode[13].blue=0;
-	diode[14].red=0;   	diode[14].green=0;   	diode[14].blue=225;
-	diode[15].red=0;   	diode[15].green=243;   	diode[15].blue=75;
-	delay_ms(250);
-
-	diode[8].red=0;   	diode[8].green=243;   	diode[8].blue=75;
-	diode[9].red=255; 	diode[9].green=255; 	diode[9].blue=225;
-	diode[10].red=255; 	diode[10].green=0;	  	diode[10].blue=225;
-	diode[11].red=255; 	diode[11].green=0;   	diode[11].blue=0;
-	diode[12].red=255; 	diode[12].green=69;  	diode[12].blue=0;
-	diode[13].red=255; 	diode[13].green=255; 	diode[13].blue=0;
-	diode[14].red=0;   	diode[14].green=255; 	diode[14].blue=0;
-	diode[15].red=0;   	diode[15].green=0;   	diode[15].blue=225;
-	delay_ms(250);
-
-	diode[8].red=0;   	diode[8].green=0;   	diode[8].blue=225;
-	diode[9].red=0;   	diode[9].green=243;   	diode[9].blue=75;
-	diode[10].red=255; 	diode[10].green=255; 	diode[10].blue=225;
-	diode[11].red=255; 	diode[11].green=0;	  	diode[11].blue=225;
-	diode[12].red=255; 	diode[12].green=0;   	diode[12].blue=0;
-	diode[13].red=255; 	diode[13].green=69;  	diode[13].blue=0;
-	diode[14].red=255; 	diode[14].green=255; 	diode[14].blue=0;
-	diode[15].red=0;   	diode[15].green=255; 	diode[15].blue=0;
-	delay_ms(250);
-
-	diode[8].red=0;   	diode[8].green=255; 	diode[8].blue=0;
-	diode[9].red=0;   	diode[9].green=0;   	diode[9].blue=225;
-	diode[10].red=0;  	diode[10].green=243;   	diode[10].blue=75;
-	diode[11].red=255; 	diode[11].green=255; 	diode[11].blue=225;
-	diode[12].red=255; 	diode[12].green=0;	  	diode[12].blue=225;
-	diode[13].red=255; 	diode[13].green=0;   	diode[13].blue=0;
-	diode[14].red=255; 	diode[14].green=69;  	diode[14].blue=0;
-	diode[15].red=255; 	diode[15].green=255; 	diode[15].blue=0;
-	delay_ms(250);
-
-	diode[8].red=255; 	diode[8].green=255; 	diode[8].blue=0;
-	diode[9].red=0;   	diode[9].green=255; 	diode[9].blue=0;
-	diode[10].red=0;   	diode[10].green=0;   	diode[10].blue=225;
-	diode[11].red=0;   	diode[11].green=243;   	diode[11].blue=75;
-	diode[12].red=255; 	diode[12].green=255; 	diode[12].blue=225;
-	diode[13].red=255; 	diode[13].green=0;	  	diode[13].blue=225;
-	diode[14].red=255; 	diode[14].green=0;   	diode[14].blue=0;
-	diode[15].red=255; 	diode[15].green=69;  	diode[15].blue=0;
-	delay_ms(250);
-
-	diode[8].red=255; 	diode[8].green=69;  	diode[8].blue=0;
-	diode[9].red=255; 	diode[9].green=255; 	diode[9].blue=0;
-	diode[10].red=0;   	diode[10].green=255; 	diode[10].blue=0;
-	diode[11].red=0;   	diode[11].green=0;   	diode[11].blue=225;
-	diode[12].red=0;   	diode[12].green=243;   	diode[12].blue=75;
-	diode[13].red=255; 	diode[13].green=255; 	diode[13].blue=225;
-	diode[14].red=255; 	diode[14].green=0;	  	diode[14].blue=225;
-	diode[15].red=255; 	diode[15].green=0;   	diode[15].blue=0;
-	delay_ms(250);
-
-	diode[8].red=255; 	diode[8].green=0;   	diode[8].blue=0;
-	diode[9].red=255; 	diode[9].green=69;  	diode[9].blue=0;
-	diode[10].red=255; 	diode[10].green=255; 	diode[10].blue=0;
-	diode[11].red=0;   	diode[11].green=255; 	diode[11].blue=0;
-	diode[12].red=0;   	diode[12].green=0;   	diode[12].blue=225;
-	diode[13].red=0;   	diode[13].green=243;   	diode[13].blue=75;
-	diode[14].red=255; 	diode[14].green=255; 	diode[14].blue=225;
-	diode[15].red=255; 	diode[15].green=0;	  	diode[15].blue=225;
-	delay_ms(250);
-
-	diode[8].red=255; 	diode[8].green=0;	  	diode[8].blue=225;
-	diode[9].red=255; 	diode[9].green=0;   	diode[9].blue=0;
-	diode[10].red=255; 	diode[10].green=69;  	diode[10].blue=0;
-	diode[11].red=255; 	diode[11].green=255; 	diode[11].blue=0;
-	diode[12].red=0;   	diode[12].green=255; 	diode[12].blue=0;
-	diode[13].red=0;   	diode[13].green=0;   	diode[13].blue=225;
-	diode[14].red=0;   	diode[14].green=243;   	diode[14].blue=75;
-	diode[15].red=255; 	diode[15].green=255; 	diode[15].blue=225;
-	delay_ms(250);
-}
-
-void seq9(int k, int j)
-{
-	int i=0;
-	for(i=k;i<16;i++)
+//druga sekwencja
+	l=0;
+	int z=5;
+	while(z <255)
 	{
-		diode[8].red=255; 	diode[8].green=255; 	diode[8].blue=225;
-		delay_ms(150);
-		diode[9].red=255; 	diode[9].green=0;	  	diode[9].blue=225;
-		delay_ms(150);
-		diode[10].red=255; 	diode[10].green=0;   	diode[10].blue=0;
-		delay_ms(150);
-		diode[11].red=255; 	diode[11].green=69;  	diode[11].blue=0;
-		delay_ms(150);
-		diode[12].red=255; 	diode[12].green=255; 	diode[12].blue=0;
-		delay_ms(150);
-		diode[13].red=0;   	diode[13].green=255; 	diode[13].blue=0;
-		delay_ms(150);
-		diode[14].red=0;   	diode[14].green=0;   	diode[14].blue=225;
-		delay_ms(150);
-		diode[15].red=0;   	diode[15].green=0;   	diode[15].blue=139;
-		delay_ms(50);
-		clear_s(150);
-
-	//////////////////////////////////////////////////////////
-		diode[15].red=0;   	diode[15].green=0;   	diode[15].blue=139;
-		delay_ms(150);
-		diode[14].red=0;   	diode[14].green=0;   	diode[14].blue=225;
-		delay_ms(150);
-		diode[13].red=0;   	diode[13].green=255; 	diode[13].blue=0;
-		delay_ms(150);
-		diode[12].red=255; 	diode[12].green=255; 	diode[12].blue=0;
-		delay_ms(150);
-		diode[11].red=255; 	diode[11].green=69;  	diode[11].blue=0;
-		delay_ms(150);
-		diode[10].red=255; 	diode[10].green=0;   	diode[10].blue=0;
-		delay_ms(150);
-		diode[9].red=255; 	diode[9].green=0;	  	diode[9].blue=225;
-		delay_ms(150);
-		diode[8].red=255; 	diode[8].green=255; 	diode[8].blue=225;
-		delay_ms(150);
-		clear_s(150);
+		//1 przejscie
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 7;
+		l++;
+		z+=10;
 	}
-}
 
-void seq10(int k, int j)
-{
-	int i=0;
-	for(i=0;i<8;i++)
+	while(z>1)
 	{
-		diode[0].red=255; 	diode[0].green=255; 	diode[0].blue=225;
-		delay_ms(150);
-		diode[1].red=255; 	diode[1].green=0;	  	diode[1].blue=225;
-		delay_ms(150);
-		diode[2].red=255; 	diode[2].green=0;   	diode[2].blue=0;
-		delay_ms(150);
-		diode[3].red=255; 	diode[3].green=69;  	diode[3].blue=0;
-		delay_ms(150);
-		diode[4].red=255; 	diode[4].green=255; 	diode[4].blue=0;
-		delay_ms(150);
-		diode[5].red=0;   	diode[5].green=255; 	diode[5].blue=0;
-		delay_ms(150);
-		diode[6].red=0;   	diode[6].green=0;   	diode[6].blue=225;
-		delay_ms(150);
-		diode[7].red=0;   	diode[7].green=0;   	diode[7].blue=139;
-		delay_ms(50);
-		clear_s(150);
-
-	//////////////////////////////////////////////////////////
-		diode[7].red=0;   	diode[7].green=0;   	diode[7].blue=139;
-		delay_ms(150);
-		diode[6].red=0;   	diode[6].green=0;   	diode[6].blue=225;
-		delay_ms(150);
-		diode[5].red=0;   	diode[5].green=255; 	diode[5].blue=0;
-		delay_ms(150);
-		diode[4].red=255; 	diode[4].green=255; 	diode[4].blue=0;
-		delay_ms(150);
-		diode[3].red=255; 	diode[3].green=69;  	diode[3].blue=0;
-		delay_ms(150);
-		diode[2].red=255; 	diode[2].green=0;   	diode[2].blue=0;
-		delay_ms(150);
-		diode[1].red=255; 	diode[1].green=0;	  	diode[1].blue=225;
-		delay_ms(150);
-		diode[0].red=255; 	diode[0].green=255; 	diode[0].blue=225;
-		delay_ms(150);
-		clear_s(150);
+	//1 przejscie
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[1].zmiany[l].r = 0;
+		Sekwencje.sekw[1].zmiany[l].g = z;
+		Sekwencje.sekw[1].zmiany[l].b = 0;
+		Sekwencje.sekw[1].zmiany[l].czas = 1;
+		Sekwencje.sekw[1].zmiany[l].dioda = 7;
+		l++;
+		z-=10;
 	}
-}
+		Sekwencje.sekw[1].ilosc = l;
 
-void seq11(int k, int j)
-{
+		//trzecia sekwencja
+		l=0;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//druga
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//trzeci
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//czwarty
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//piaty
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//szosta
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//siedem
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+		//osiem
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas =0 ;
+		Sekwencje.sekw[2].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 69;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 0;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 0;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 0;
+		Sekwencje.sekw[2].zmiany[l].g = 243;
+		Sekwencje.sekw[2].zmiany[l].b = 75;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].r = 255;
+		Sekwencje.sekw[2].zmiany[l].g = 255;
+		Sekwencje.sekw[2].zmiany[l].b = 255;
+		Sekwencje.sekw[2].zmiany[l].czas = 0;
+		Sekwencje.sekw[2].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[2].zmiany[l].czas = 70;
+		l++;
+
+		Sekwencje.sekw[2].ilosc = l;
+
+//czwarta sekwencja
+	l=0;
 	int x=5;
-	while(x<255)
+	while(x <255)
 	{
-			diode[0].blue=x;
-			diode[1].blue=x;
-			diode[2].blue=x;
-			diode[3].blue=x;
-			diode[4].blue=x;
-			diode[5].blue=x;
-			diode[6].blue=x;
-			diode[7].blue=x;
-			x+=10;
-			delay_ms(150);
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 7;
+		l++;
+		x+=10;
 	}
-		while(x>1)
-		{
-			diode[0].blue=x;
-			diode[1].blue=x;
-			diode[2].blue=x;
-			diode[3].blue=x;
-			diode[4].blue=x;
-			diode[5].blue=x;
-			diode[6].blue=x;
-			diode[7].blue=x;
-			x-=10;
-			delay_ms(150);
-		}
+	while(x>1)
+	{
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[3].zmiany[l].r = x;
+		Sekwencje.sekw[3].zmiany[l].g = 51;
+		Sekwencje.sekw[3].zmiany[l].b = 0;
+		Sekwencje.sekw[3].zmiany[l].czas = 1;
+		Sekwencje.sekw[3].zmiany[l].dioda = 7;
+		l++;
+		x-=10;
+	}
+		Sekwencje.sekw[3].ilosc = l;
 
-//wiecej kolorow
-//	x=5;
-//	while(x<255)
-//	{
-//
-//
-//		diode[0].red=x; diode[0].blue=25;
-//		diode[1].red=x;	diode[1].blue=25;
-//		diode[2].red=x;	diode[2].blue=25;
-//		diode[3].red=x;	diode[3].blue=25;
-//		diode[4].red=x;	diode[4].blue=25;
-//		diode[5].red=x;	diode[5].blue=25;
-//		diode[6].red=x;	diode[6].blue=25;
-//		diode[7].red=x;	diode[7].blue=25;
-//		x+=10;
-//		delay_ms(150);
-//	}
-//	while(x>0)
-//	{
-//				diode[0].red=x; diode[0].blue=25;
-//				diode[1].red=x;	diode[1].blue=25;
-//				diode[2].red=x;	diode[2].blue=25;
-//				diode[3].red=x;	diode[3].blue=25;
-//				diode[4].red=x;	diode[4].blue=25;
-//				diode[5].red=x;	diode[5].blue=25;
-//				diode[6].red=x;	diode[6].blue=25;
-//				diode[7].red=x;	diode[7].blue=25;
-//			x-=10;
-//			delay_ms(150);
-//	}
-//	x=5;
-//	while(x<255)
-//	{
-//		diode[0].red=x; diode[0].green=51;
-//		diode[1].red=x;	diode[1].green=51;
-//		diode[2].red=x;	diode[2].green=51;
-//		diode[3].red=x;	diode[3].green=51;
-//		diode[4].red=x;	diode[4].green=51;
-//		diode[5].red=x;	diode[5].green=51;
-//		diode[6].red=x;	diode[6].green=51;
-//		diode[7].red=x;	diode[7].green=51;
-//		x+=10;
-//		delay_ms(150);
-//	}
-//	while(x>0)
-//	{
-//		diode[0].red=x; diode[0].green=51;
-//		diode[1].red=x;	diode[1].green=51;
-//		diode[2].red=x;	diode[2].green=51;
-//		diode[3].red=x;	diode[3].green=51;
-//		diode[4].red=x;	diode[4].green=51;
-//		diode[5].red=x;	diode[5].green=51;
-//		diode[6].red=x;	diode[6].green=51;
-//		diode[7].red=x;	diode[7].green=51;
-//			x-=10;
-//			delay_ms(150);
-//	}
+		//sekwencja 5
+		l=0;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//druga
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//trzecia
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//czwarta
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//piata
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//szosta
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//siedem
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		//osiem
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 47;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 203;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].r = 63;
+		Sekwencje.sekw[4].zmiany[l].g = 0;
+		Sekwencje.sekw[4].zmiany[l].b = 23;
+		Sekwencje.sekw[4].zmiany[l].czas = 0;
+		Sekwencje.sekw[4].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[4].zmiany[l].czas = 70;
+		l++;
+		Sekwencje.sekw[4].ilosc = l;
+
+		//sekwencja 6
+		l = 0;
+		//kolor1
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 195;
+		Sekwencje.sekw[5].zmiany[l].g = 111;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 7;
+		l++;
+
+		//kolor 2
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 100;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 0;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 7;
+		l++;
+
+		//kolor 3
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 255;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 51;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 7;
+		l++;
+
+		//kolor4
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 19;
+		Sekwencje.sekw[5].zmiany[l].g = 0;
+		Sekwencje.sekw[5].zmiany[l].b = 207;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 7;
+		l++;
+
+		//kolor5
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 0;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 1;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 2;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 3;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 4;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 5;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 6;
+		l++;
+		Sekwencje.sekw[5].zmiany[l].r = 0;
+		Sekwencje.sekw[5].zmiany[l].g = 243;
+		Sekwencje.sekw[5].zmiany[l].b = 75;
+		Sekwencje.sekw[5].zmiany[l].czas = 20;
+		Sekwencje.sekw[5].zmiany[l].dioda = 7;
+		l++;
+		Sekwencje.sekw[5].ilosc = l;
 }
 
-void seq112(int k, int j)
+//zapala diody
+void pokazZmiane()
 {
-	int x=5;
-	while(x<255)
+	for(int i = 0; i < 2; i++)
 	{
-
-			diode[8].blue=x;
-			diode[9].blue=x;
-			diode[10].blue=x;
-			diode[11].blue=x;
-			diode[12].blue=x;
-			diode[13].blue=x;
-			diode[14].blue=x;
-			diode[15].blue=x;
-			x+=10;
-			delay_ms(150);
-	}
-		while(x>1)
+		if(Ringi[i].sekw != 0)
 		{
-			diode[8].blue=x;
-			diode[9].blue=x;
-			diode[10].blue=x;
-			diode[11].blue=x;
-			diode[12].blue=x;
-			diode[13].blue=x;
-			diode[14].blue=x;
-			diode[15].blue=x;
-			x-=10;
-			delay_ms(150);
+			if(Ringi[i].czas >= Ringi[i].sekw->zmiany[Ringi[i].index].czas)
+			{
+				int czas_0 = true;
+				struct zmiana* zm = &Ringi[i].sekw->zmiany[Ringi[i].index];
+				do
+				{
+					diode[zm->dioda + Ringi[i].dioda_od].red = zm->r;
+					diode[zm->dioda + Ringi[i].dioda_od].green = zm->g;
+					diode[zm->dioda + Ringi[i].dioda_od].blue = zm->b;
+
+					czas_0 = (zm->czas == 0);
+
+					Ringi[i].index++;
+					if(Ringi[i].index >= Ringi[i].sekw->ilosc)
+					{
+						Ringi[i].index = 0;
+					}
+					zm = &Ringi[i].sekw->zmiany[Ringi[i].index];
+				}while((zm->czas == 0) && czas_0);
+
+				Ringi[i].czas = 0;
+			}
+			else
+			{
+				Ringi[i].czas++;
+			}
 		}
+	}
 }
-
-
