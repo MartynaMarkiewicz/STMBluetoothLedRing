@@ -11,9 +11,6 @@
 *.bat
 *.properties
 bat
-properties
-
-.DS_Store
 
 # built application files
 *.apk
