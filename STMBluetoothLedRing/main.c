@@ -43,12 +43,12 @@ int red_p,red_p2;
 int green_p,green_p2;
 int blue_p,blue_p2;
 
-volatile int zmienna_usart1,zmienna_usart12;
-volatile int zmienna_usart2,zmienna_usart22;
-volatile int zmienna_usart3,zmienna_usart32;
-volatile int zmienna_usart4,zmienna_usart42;
-volatile int zmienna_usart5,zmienna_usart52;
-volatile int zmienna_usart6,zmienna_usart62;
+int zmienna_usart1,zmienna_usart12;
+int zmienna_usart2,zmienna_usart22;
+int zmienna_usart3,zmienna_usart32;
+int zmienna_usart4,zmienna_usart42;
+int zmienna_usart5,zmienna_usart52;
+int zmienna_usart6,zmienna_usart62;
 
 void setBrightness(uint8_t x);
 uint8_t getBrightness(void);
