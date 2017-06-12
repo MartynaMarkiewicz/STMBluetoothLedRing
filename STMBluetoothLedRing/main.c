@@ -202,10 +202,13 @@ void USART3_IRQHandler(void)
 				m=0;
 			}
 			// RGB - RING_1
-			rgb(red_p, green_p,blue_p);
+			if(zmienna_usart1==0&&zmienna_usart2==0&&zmienna_usart3==0&&zmienna_usart4==0&&zmienna_usart5==0&&zmienna_usart6==0)
+			{
+				rgb(red_p, green_p,blue_p);
+			}
 
 
-			// KOLORY - RING_1
+		//	 KOLORY - RING_1
 			if(USART3->DR == 'g')
 			{
 				red_br=135;
@@ -289,29 +292,28 @@ void USART3_IRQHandler(void)
 				zmienna_usart6=1;
 			}
 
-			if(brightness)
-						{
-							if(red_br==327)
-							{
-								red_br=0;
-							}
-							if(green_br==283)
-							{
-								green_br=0;
-							}
-							if(blue_br==263)
-							{
-								blue_br=0;
-							}
-							int i=0;
-
-							for(i=0;i<8;i++)
-							{
-								diode[i].red=(red_br* brightness) >> 8;
-								diode[i].green=(green_br* brightness) >> 8;
-								diode[i].blue=(blue_br* brightness) >> 8;
-							}
-						}
+			if(brightness&&zmienna_usart1==0&&zmienna_usart2==0&&zmienna_usart3==0&&zmienna_usart4==0&&zmienna_usart5==0&&zmienna_usart6==0)
+			{
+				if(red_br==327)
+				{
+					red_br=0;
+				}
+				if(green_br==283)
+				{
+					green_br=0;
+				}
+				if(blue_br==263)
+				{
+					blue_br=0;
+				}
+				int i=0;
+				for(i=0;i<8;i++)
+				{
+					diode[i].red=(red_br* brightness) >> 8;
+					diode[i].green=(green_br* brightness) >> 8;
+					diode[i].blue=(blue_br* brightness) >> 8;
+				}
+			}
 
 			// TURN OFF
 			if(USART3->DR == 'O')
@@ -319,18 +321,20 @@ void USART3_IRQHandler(void)
 				Ringi[0].sekw =0;
 				Ringi[0].czas=0;
 				Ringi[0].index = 0;
-				zmienna_usart1=0;
-				zmienna_usart2=0;
-				zmienna_usart3=0;
-				zmienna_usart4=0;
-				zmienna_usart5=0;
-				zmienna_usart6=0;
+
 				red_br=0;
 				green_br=0;
 				blue_br=0;
 				red_p=0;
 				green_p=0;
 				blue_p=0;
+
+				zmienna_usart1=0;
+				zmienna_usart2=0;
+				zmienna_usart3=0;
+				zmienna_usart4=0;
+				zmienna_usart5=0;
+				zmienna_usart6=0;
 			}
 		}
 
@@ -421,7 +425,11 @@ void USART3_IRQHandler(void)
 				m1=0;
 			}
 			// RGB - RING_2
-			rgb2(red_p2, green_p2,blue_p2);
+
+			if(zmienna_usart12==0&&zmienna_usart22==0&&zmienna_usart32==0&&zmienna_usart42==0&&zmienna_usart52==0&&zmienna_usart62==0)
+			{
+				rgb2(red_p2, green_p2,blue_p2);
+			}
 
 			// KOLORY - RING_2
 			if(USART3->DR == 'g')
@@ -506,47 +514,50 @@ void USART3_IRQHandler(void)
 			{
 				zmienna_usart62=1;
 			}
-			if(brightness2)
-					{
-						if(red_br2==327)
-						{
-							red_br2=0;
-						}
-						if(green_br2==283)
-						{
-							green_br2=0;
-						}
-						if(blue_br2==263)
-						{
-							blue_br2=0;
-						}
-						int i=8;
 
-						for(i=8;i<16;i++)
-						{
-							diode[i].red=(red_br2* brightness2) >> 8;
-							diode[i].green=(green_br2* brightness2) >> 8;
-							diode[i].blue=(blue_br2* brightness2) >> 8;
-						}
-					}
+			if(brightness2&&zmienna_usart12==0&&zmienna_usart22==0&&zmienna_usart32==0&&zmienna_usart42==0&&zmienna_usart52==0&&zmienna_usart62==0)
+			{
+				if(red_br2==327)
+				{
+					red_br2=0;
+				}
+				if(green_br2==283)
+				{
+					green_br2=0;
+				}
+				if(blue_br2==263)
+				{
+					blue_br2=0;
+				}
+				int i=8;
+				for(i=8;i<16;i++)
+				{
+					diode[i].red=(red_br2* brightness2) >> 8;
+					diode[i].green=(green_br2* brightness2) >> 8;
+					diode[i].blue=(blue_br2* brightness2) >> 8;
+				}
+			}
+
 			// TURN OFF
 			if(USART3->DR == 'O')
 			{
 				Ringi[1].sekw =0;
 				Ringi[1].czas=0;
 				Ringi[1].index = 0;
-				zmienna_usart12=0;
-				zmienna_usart22=0;
-				zmienna_usart32=0;
-				zmienna_usart42=0;
-				zmienna_usart52=0;
-				zmienna_usart62=0;
+
 				red_br2=0;
 				green_br2=0;
 				blue_br2=0;
 				red_p2=0;
 				green_p2=0;
 				blue_p2=0;
+
+				zmienna_usart12=0;
+				zmienna_usart22=0;
+				zmienna_usart32=0;
+				zmienna_usart42=0;
+				zmienna_usart52=0;
+				zmienna_usart62=0;
 			}
 		}
 	}
