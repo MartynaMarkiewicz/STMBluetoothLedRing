@@ -35,6 +35,7 @@
 *.elf
 *.hex
 *.map
+*.log
 
 # Other extensions
 *.pdf
