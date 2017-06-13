@@ -951,6 +951,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 135;
                             Integer green = 31;
                             Integer blue = 0;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1012,6 +1014,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 195;
                             Integer green = 111;
                             Integer blue = 0;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1073,6 +1077,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 24;
                             Integer green = 100;
                             Integer blue = 0;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1134,6 +1140,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 0;
                             Integer green = 243;
                             Integer blue = 75;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1195,6 +1203,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 255;
                             Integer green = 0;
                             Integer blue = 51;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1256,6 +1266,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 255;
                             Integer green = 0;
                             Integer blue = 255;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1317,6 +1329,8 @@ public class ledControl extends ActionBarActivity {
                             Integer red = 19;
                             Integer green = 0;
                             Integer blue = 207;
+                            brightness.setProgress(10);
+                            l.setText(String.valueOf(100+"%"));
                             lumnred.setText(String.valueOf(progress));
                             r.setText(String.valueOf(red));
                             lumngreen.setText(String.valueOf(progress));
@@ -1552,6 +1566,13 @@ public class ledControl extends ActionBarActivity {
                     l.setText(String.valueOf(100 + "%"));
                     changevar();
                     Socket.getOutputStream().write('O');
+                    Socket.getOutputStream().write('O');
+                    Socket.getOutputStream().write('R');
+                    Socket.getOutputStream().write(Integer.valueOf(0));
+                    Socket.getOutputStream().write('G');
+                    Socket.getOutputStream().write(Integer.valueOf(0));
+                    Socket.getOutputStream().write('B');
+                    Socket.getOutputStream().write(Integer.valueOf(0));
                     if(temp_ring==0)
                     {
                         pr_redR1=0;
@@ -1608,19 +1629,19 @@ public class ledControl extends ActionBarActivity {
                     g.setText(String.valueOf(pr));
                     lumnblue.setText(String.valueOf(progress));
                     b.setText(String.valueOf(pr));
-                    try
-                    {
-                        Socket.getOutputStream().write('R');
-                        Socket.getOutputStream().write(Integer.valueOf(pr));
-                        Socket.getOutputStream().write('G');
-                        Socket.getOutputStream().write(Integer.valueOf(pr));
-                        Socket.getOutputStream().write('B');
-                        Socket.getOutputStream().write(Integer.valueOf(pr));
-                    }
-                    catch (IOException e)
-                    {
-                        msg("Error");
-                    }
+                   // try
+                   // {
+                      //  Socket.getOutputStream().write('R');
+                      //  Socket.getOutputStream().write(Integer.valueOf(pr));
+                        //Socket.getOutputStream().write('G');
+                        //Socket.getOutputStream().write(Integer.valueOf(pr));
+                        //Socket.getOutputStream().write('B');
+                        //Socket.getOutputStream().write(Integer.valueOf(pr));
+                  //  }
+                    //catch (IOException e)
+                    //{
+                     //   msg("Error");
+                    //}
     }
 
     // fast way to call Toast
