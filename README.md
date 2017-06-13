@@ -53,10 +53,6 @@ Improvements:<br />
     -controlling the speed  of sequences<br />
     -controlling the brightness  of sequences<br />
     -adding new sequences<br />
-    
-There is a one bug.<br />
-While switching between the two rings, when the sequence is on, a glimpse can be seen.
-
 
 ### Attributions:
 https://github.com/C3MA/stm-ledstrip - ws2812.h, ws2812.c<br />
